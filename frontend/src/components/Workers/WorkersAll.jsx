@@ -1,8 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AakashImg from  "./aakash.jpg"
 import SumitImg from "./sumit.png"
 
 const WorkersAll = () => {
+  const [data, setData] = useState(null)
+
+
+  useEffect(() => {
+    fetch('http://localhost:3000/')
+    .then(res => res.json())
+    .then(data=> {
+      setData(data)
+    })
+    .catch(err => console.error("Error fetching: ", err))
+  }, [])
+
+
   return (
     <>
       <div
@@ -69,7 +82,21 @@ const WorkersAll = () => {
             </div>
           </div>
         </div>
+
       </div>
+
+      {data ? (
+        <div>
+          <p><strong>Name:</strong> {data.fullName}</p>
+          <p><strong>Email:</strong> {data.email}</p>
+          <p><strong>City:</strong> {data.city}</p>
+          <p><strong>Age:</strong> {data.age}</p>
+        </div>
+      ) : (
+        <p>Loading...</p>
+      )}
+
+
     </>
   );
 };
