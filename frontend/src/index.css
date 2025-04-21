@@ -1,0 +1,71 @@
+body {
+  background-color: #a3b18a;
+  margin: 0;
+  padding: 0;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+body::selection{
+  background-color: #fff;
+  color: black;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+nav {
+  background-color: #344e41;
+}
+
+.hero-section {
+  background-color: #3a5a40;
+}
+
+.about-home {
+  background-color: #264653;
+  letter-spacing: 1px;
+  margin-top: 5rem;
+  padding: 3rem;
+}
+
+.how-we-work {
+  margin-top: 5rem;
+}
+.how-we-work > h1 {
+  margin-bottom: 3rem;
+  background: linear-gradient(to right, #a3b18a, #588157, #3a5a40, #344e41);
+}
+
+.card {
+  background-color: #dad7cd;
+}
+
+.action-bar {
+  background: linear-gradient(to left, #51136e, #473086, #223b61);
+  margin-top: 5rem;
+}
+
+.signup-container{
+  background-color: #4a4e69;
+}
+
+.signin-container{
+  background-color: #6d597a;
+}
+
+.engineer-img{
+  width: 80%;
+}
+
+.workers-all{
+  margin: 5rem;
+}
+
+.workers-avatar{
+  /* width: 50%; */
+  height: 200px;
+  width: 200px;
+  border-radius: 60%;
+}
