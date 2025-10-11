@@ -31,7 +31,7 @@ const Signup = () => {
         navigate("/signin");
       }, 2000);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Signup Failed", {
+      toast.error(error.response?.data?.message, {
         position: "top-center",
         autoClose: 2000,
         transition: Bounce,
