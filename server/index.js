@@ -12,7 +12,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_ORIGIN || "https://swifthire-app.vercel.app", // your frontend URL
+    origin: process.env.FRONTEND_ORIGIN, 
     credentials: true, // allow cookies or auth headers
   })
 );
