@@ -17,8 +17,8 @@ const Signup = () => {
 
     try {
       const response = await axios.post(
-        // "http://localhost:3000/signup"
-        "https://swifthire-app.vercel.app/api/signup",
+        "http://localhost:3000/signup"
+        ,
         { name, email, password },
         { withCredentials: true }
       );
