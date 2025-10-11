@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,7 +19,12 @@ const Navbar = () => {
   const handleLogout = async () => {
     localStorage.removeItem("token");
     setIsAuthenticated(false);
-    navigate("/signin");
+    toast.info("Sign out successfully", {
+      position: "top-center",
+      autoClose: 1500,
+      transition: Bounce,
+    });
+    setTimeout(() => navigate("/signin"), 1500);
   };
 
   return (
@@ -137,6 +144,7 @@ const Navbar = () => {
           </div>
         </div>
       )}
+      <ToastContainer />
     </nav>
   );
 };

@@ -35,11 +35,11 @@ const Profile = () => {
         });
 
         setUser(response.data.user);
-        toast.success("Profile loaded successfully!", {
-          position: "top-center",
-          autoClose: 1500,
-          transition: Bounce,
-        });
+        // toast.success("Profile loaded successfully!", {
+        //   position: "top-center",
+        //   autoClose: 2000,
+        //   transition: Bounce,
+        // });
       } catch (error) {
         console.error(error);
         toast.error(
@@ -62,7 +62,7 @@ const Profile = () => {
   // ✅ Handle logout
   const handleLogout = () => {
     localStorage.removeItem("token");
-    toast.info("Logged out successfully", {
+    toast.info("Sign out successfully", {
       position: "top-center",
       autoClose: 1500,
       transition: Bounce,
@@ -93,7 +93,7 @@ const Profile = () => {
               onClick={handleLogout}
               className="bg-red-500 hover:bg-red-600 text-white py-2 px-6 rounded-md transition duration-200 cursor-pointer"
             >
-              Logout
+              Sign Out
             </button>
           </div>
         ) : (

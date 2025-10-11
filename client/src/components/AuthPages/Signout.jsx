@@ -19,7 +19,7 @@ const Signout = () => {
           { withCredentials: true }
         );
 
-        toast.success(response.data.message || "Logged out successfully", {
+        toast.success(response.data.message || "Sign Out Successfull", {
           position: "top-center",
           autoClose: 2000,
           transition: Bounce,
