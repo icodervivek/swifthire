@@ -25,7 +25,10 @@ const Profile = () => {
           return;
         }
 
-        const response = await axios.get("http://localhost:3000/profile", {
+        const response = await axios.get(
+          // "http://localhost:3000/profile"
+          "https://swifthire-app.vercel.app/api/profile"
+          , {
           headers: {
             Authorization: `Bearer ${token}`,
           },

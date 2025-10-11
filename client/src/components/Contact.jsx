@@ -15,7 +15,8 @@ const Contact = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/contact",
+        // "http://localhost:3000/contact"
+        "https://swifthire-app.vercel.app/api/contact",
         { name, email, message },
         { withCredentials: true }
       );

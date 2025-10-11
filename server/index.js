@@ -12,11 +12,10 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // your frontend URL
-    credentials: true,               // allow cookies or auth headers
+    origin: process.env.FRONTEND_ORIGIN || "https://swifthire-app.vercel.app", // your frontend URL
+    credentials: true, // allow cookies or auth headers
   })
 );
-
 
 app.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
@@ -24,7 +23,10 @@ app.post("/signup", async (req, res) => {
     return res.status(400).json({ message: "All fields required" });
 
   try {
-    const userExists = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    const userExists = await pool.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    );
     if (userExists.rows.length > 0)
       return res.status(400).json({ message: "User already exists" });
 
@@ -46,7 +48,9 @@ app.post("/signin", async (req, res) => {
     return res.status(400).json({ message: "All fields required" });
 
   try {
-    const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    const result = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
     if (result.rows.length === 0)
       return res.status(400).json({ message: "User not found" });
 
@@ -69,7 +73,10 @@ app.post("/signin", async (req, res) => {
 
 app.get("/profile", verifyToken, async (req, res) => {
   try {
-    const user = await pool.query("SELECT id, name, email FROM users WHERE id = $1", [req.user.id]);
+    const user = await pool.query(
+      "SELECT id, name, email FROM users WHERE id = $1",
+      [req.user.id]
+    );
     res.json({ user: user.rows[0] });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
@@ -88,7 +95,6 @@ function verifyToken(req, res, next) {
   });
 }
 
-
 app.post("/contact", async (req, res) => {
   const { name, email, message } = req.body;
 
@@ -102,14 +108,16 @@ app.post("/contact", async (req, res) => {
       [name, email, message]
     );
 
-    res.json({ message: "Message sent successfully!", contact: result.rows[0] });
+    res.json({
+      message: "Message sent successfully!",
+      contact: result.rows[0],
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-
-app.listen(process.env.PORT, () =>
+app.listen(process.env.PORT || "https://swifthire-app.vercel.app/api", () =>
   console.log(`🚀 Server running on port ${process.env.PORT}`)
 );

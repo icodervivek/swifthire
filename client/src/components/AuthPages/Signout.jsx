@@ -13,7 +13,8 @@ const Signout = () => {
     const signoutUser = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:3000/api/signout",
+          // "http://localhost:3000/api/signout"
+          "https://swifthire-app.vercel.app/api/signout",
           {},
           { withCredentials: true }
         );
