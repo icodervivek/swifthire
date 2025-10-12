@@ -118,6 +118,28 @@ app.post("/contact", async (req, res) => {
   }
 });
 
+
+app.get("/job-seekers", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM job_seekers ORDER BY id ASC");
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("Error fetching job seekers:", err);
+    res.status(500).json({ message: "Error fetching job seekers" });
+  }
+});
+
+app.get("/companies", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM companies ORDER BY created_at DESC");
+    res.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error("Error fetching companies:", err.message);
+    res.status(500).json({ success: false, message: "Server error while fetching companies" });
+  }
+});
+
+
 app.listen(process.env.PORT, () =>
   console.log(`🚀 Server running on port ${process.env.PORT}`)
 );
