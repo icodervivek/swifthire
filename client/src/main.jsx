@@ -12,6 +12,11 @@ import JobSeeker from "./JobSeeker.jsx";
 import HiringCompanies from "./HiringCompanies.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import UploadResume from "./UploadResume.jsx";
+import RecruiterHome from "./recruiter/RecruiterHome.jsx";
+import RecruiterSignup from "./recruiter/RecruiterSignup.jsx";
+import RecruiterSignin from "./recruiter/RecruiterSignin.jsx";
+import ProtectedRecruiterRoute from "./recruiter/ProtectedRecruiterRoute.jsx";
+import PostJob from "./recruiter/PostJob.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -23,6 +28,25 @@ createRoot(document.getElementById("root")).render(
         <Route path="/profile" element={<Profile />}></Route>
         <Route path="/about" element={<About />}></Route>
         <Route path="/contact" element={<Contact />}></Route>
+        <Route
+          path="/recruiter"
+          element={
+            <ProtectedRecruiterRoute>
+              <RecruiterHome />
+            </ProtectedRecruiterRoute>
+          }
+        ></Route>
+        <Route
+          path="/recruiter/post-job"
+          element={
+            <ProtectedRecruiterRoute>
+              <PostJob />
+            </ProtectedRecruiterRoute>
+          }
+        ></Route>
+
+        <Route path="/recruiter/signup" element={<RecruiterSignup />}></Route>
+        <Route path="/recruiter/signin" element={<RecruiterSignin />}></Route>
         <Route
           path="/workers"
           element={
