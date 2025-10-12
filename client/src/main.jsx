@@ -6,7 +6,6 @@ import Home from "./Home.jsx";
 import Signup from "./components/AuthPages/Signup.jsx";
 import Signin from "./components/AuthPages/Signin.jsx";
 import Profile from "./components/AuthPages/Profile.jsx";
-import Signout from "./components/AuthPages/Signout.jsx";
 import About from "./components/About.jsx";
 import Contact from "./components/Contact.jsx";
 import JobSeeker from "./JobSeeker.jsx";
