@@ -3,6 +3,7 @@ import axios from "axios";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const HiringCompanies = () => {
   const [companies, setCompanies] = useState([]);
@@ -24,25 +25,49 @@ const HiringCompanies = () => {
     fetchCompanies();
   }, []);
 
+  // Framer Motion variants for cards
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.1, duration: 0.6, ease: "easeOut" },
+    }),
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
       <div className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12 tracking-wider">
-        <div className="text-center bg-gray-800 p-12 rounded-xl shadow-lg mx-auto my-12">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center bg-gray-800 p-12 rounded-xl shadow-lg mx-auto my-12"
+        >
           <p className="text-3xl font-extrabold mb-6 text-white">
             Discover Your Perfect Job with AI
           </p>
-         <Link to="/find-job/upload-resume">
-          <button className="bg-gradient-to-r from-[#2a7b9b] to-[#57c785] text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:scale-105 transition-transform cursor-pointer">
-            Check Now
-          </button>
-         </Link>
-        </div>
+          <Link to="/find-job/upload-resume">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-gradient-to-r from-[#2a7b9b] to-[#57c785] text-white font-semibold px-8 py-3 rounded-full shadow-lg transition-transform cursor-pointer"
+            >
+              Check Now
+            </motion.button>
+          </Link>
+        </motion.div>
 
-        <h2 className="text-4xl font-extrabold text-center mb-10">
+        <motion.h2
+          className="text-4xl font-extrabold text-center mb-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+        >
           Companies Ready to Hire 🏢💼
-        </h2>
+        </motion.h2>
 
         {loading ? (
           <div className="text-center text-gray-600 text-lg">Loading...</div>
@@ -51,12 +76,17 @@ const HiringCompanies = () => {
             No hiring companies found.
           </div>
         ) : (
-          <div className=" scroll-horizontal overflow-x-auto py-6">
+          <div className="scroll-horizontal overflow-x-auto py-6">
             <div className="flex gap-6 min-w-max">
-              {companies.map((company) => (
-                <div
+              {companies.map((company, index) => (
+                <motion.div
                   key={company.id}
                   className="bg-gray-900 text-white rounded-3xl shadow-lg p-6 min-w-[280px] hover:scale-105 transition-transform duration-300 flex-shrink-0"
+                  custom={index}
+                  initial="hidden"
+                  animate="visible"
+                  variants={cardVariants}
+                  whileHover={{ scale: 1.05 }}
                 >
                   <h3 className="text-2xl font-bold mb-2">
                     {company.company_name}
@@ -90,7 +120,7 @@ const HiringCompanies = () => {
                       ? "✅ Immediate Hiring"
                       : "⏳ Hiring Soon"}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
