@@ -7,12 +7,16 @@ const UploadResume = () => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
+  const [matchedJobs, setMatchedJobs] = useState([]);
+  const [skills, setSkills] = useState([]);
 
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
     if (selected && selected.type === "application/pdf") {
       setFile(selected);
       setUploaded(false);
+      setMatchedJobs([]);
+      setSkills([]);
     } else {
       alert("Please upload a PDF file only!");
     }
@@ -22,23 +26,45 @@ const UploadResume = () => {
     if (!file) return alert("Please select a file first!");
     setUploading(true);
 
-    // Simulate upload delay
-    setTimeout(() => {
+    try {
+      const formData = new FormData();
+      formData.append("pdf", file);
+
+      const res = await fetch("http://localhost:3000/resume/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
       setUploading(false);
       setUploaded(true);
-    }, 2000);
+
+      if (data.matchedJobs) {
+        setMatchedJobs(data.matchedJobs);
+        setSkills(data.skills || []);
+      } else {
+        setMatchedJobs([]);
+        setSkills([]);
+      }
+    } catch (err) {
+      console.error(err);
+      setUploading(false);
+      alert("Failed to upload resume. Please try again.");
+    }
   };
 
   const resetForm = () => {
     setFile(null);
     setUploaded(false);
+    setMatchedJobs([]);
+    setSkills([]);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0b0b0b] text-white">
       <Navbar />
 
-      {/* Main Container */}
+      {/* ===== Upload Form Container ===== */}
       <div className="flex-grow flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-16">
         <div className="bg-gray-900/80 border border-[#57c785] rounded-3xl shadow-xl p-10 sm:p-12 md:p-16 w-full max-w-lg text-center backdrop-blur-lg">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#57c785] mb-6">
@@ -46,7 +72,7 @@ const UploadResume = () => {
           </h2>
           <p className="text-gray-400 mb-8">
             Upload your resume and get instant job recommendations tailored to
-            your skills and experience. Let our AI do the matchmaking for you!
+            your skills and experience.
           </p>
 
           {/* File Upload Area */}
@@ -88,7 +114,7 @@ const UploadResume = () => {
                       uploading
                         ? "bg-gray-600"
                         : "bg-[#57c785] hover:bg-[#4cb377]"
-                    } text-white px-6 py-2 rounded-full transition-transform duration-300`}
+                    } text-white px-6 py-2 rounded-full transition-transform duration-300 cursor-pointer`}
                   >
                     {uploading ? "Uploading..." : "Upload"}
                   </button>
@@ -106,7 +132,7 @@ const UploadResume = () => {
                 </button>
               </div>
 
-              {/* Progress bar (Simulated) */}
+              {/* Progress bar */}
               {uploading && (
                 <div className="w-full bg-gray-700 rounded-full h-2 mt-4 overflow-hidden">
                   <div className="bg-[#57c785] h-2 animate-pulse w-3/4"></div>
@@ -116,6 +142,39 @@ const UploadResume = () => {
           )}
         </div>
       </div>
+
+      {/* ===== Job Recommendations Section ===== */}
+      {uploaded && (
+        <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-5xl mx-auto">
+          <h3 className="text-2xl font-bold text-center text-[#57c785] mb-4">
+            {matchedJobs.length
+              ? "Job Recommendations"
+              : "No Matching Job Recommendations Found"}
+          </h3>
+
+          {matchedJobs.length > 0 && (
+            <>
+              <p className="text-gray-400 mb-6">
+                Based on extracted skills: {skills.join(", ")}
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {matchedJobs.map((job) => (
+                  <div
+                    key={job.id}
+                    className="p-6 border border-gray-700 rounded-lg hover:bg-gray-700 transition"
+                  >
+                    <p className="font-semibold text-lg">{job.company_name}</p>
+                    <p className="text-gray-400">Role: {job.hiring_for}</p>
+                    <p className="text-gray-400">City: {job.city}</p>
+                    <p className="text-gray-400">Open Positions: {job.open_positions}</p>
+                    <p className="text-gray-400">Contact: {job.contact_email}</p>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       <Footer />
     </div>
