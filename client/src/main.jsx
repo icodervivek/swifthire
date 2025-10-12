@@ -12,6 +12,7 @@ import Contact from "./components/Contact.jsx";
 import JobSeeker from "./JobSeeker.jsx";
 import HiringCompanies from "./HiringCompanies.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import UploadResume from "./UploadResume.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -36,6 +37,14 @@ createRoot(document.getElementById("root")).render(
           element={
             <ProtectedRoute>
               <HiringCompanies />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/find-job/upload-resume"
+          element={
+            <ProtectedRoute>
+              <UploadResume />
             </ProtectedRoute>
           }
         />
