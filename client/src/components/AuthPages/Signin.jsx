@@ -25,7 +25,7 @@ const Signin = () => {
         autoClose: 2000,
         transition: Bounce,
       });
-      setTimeout(() => navigate("/profile"), 2000);
+      setTimeout(() => navigate("/"), 2000);
     } catch (error) {
       toast.error(error.response?.data?.message || "Signin Failed", {
         position: "top-center",
