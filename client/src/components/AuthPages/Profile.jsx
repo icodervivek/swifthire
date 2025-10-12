@@ -103,7 +103,7 @@ const Profile = () => {
             </p>
             <motion.button
               onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white py-3 px-8 rounded-full font-semibold shadow-lg"
+              className="bg-red-500 hover:bg-red-600 cursor-pointer text-white py-3 px-8 rounded-full font-semibold shadow-lg"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
