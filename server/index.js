@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import pool from "./db.js";
 
 import resumeRouter from "./routes/resumeRouter.js";
-
+import recruiterRouter from "./routes/recruiterRouter.js";
 
 dotenv.config();
 
@@ -14,12 +14,13 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: process.env.FRONTEND_ORIGIN, 
+    origin: process.env.FRONTEND_ORIGIN,
     credentials: true, // allow cookies or auth headers
   })
 );
 
-app.use("/resume", resumeRouter)
+app.use("/resume", resumeRouter);
+app.use("/recruiter", recruiterRouter);
 
 app.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
@@ -122,10 +123,11 @@ app.post("/contact", async (req, res) => {
   }
 });
 
-
 app.get("/job-seekers", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM job_seekers ORDER BY id ASC");
+    const result = await pool.query(
+      "SELECT * FROM job_seekers ORDER BY id ASC"
+    );
     res.status(200).json(result.rows);
   } catch (err) {
     console.error("Error fetching job seekers:", err);
@@ -135,14 +137,20 @@ app.get("/job-seekers", async (req, res) => {
 
 app.get("/companies", async (req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM companies ORDER BY created_at DESC");
+    const result = await pool.query(
+      "SELECT * FROM companies ORDER BY created_at DESC"
+    );
     res.json({ success: true, data: result.rows });
   } catch (err) {
     console.error("Error fetching companies:", err.message);
-    res.status(500).json({ success: false, message: "Server error while fetching companies" });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Server error while fetching companies",
+      });
   }
 });
-
 
 app.listen(process.env.PORT, () =>
   console.log(`🚀 Server running on port ${process.env.PORT}`)
