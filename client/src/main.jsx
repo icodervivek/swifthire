@@ -9,6 +9,9 @@ import Profile from "./components/AuthPages/Profile.jsx";
 import Signout from "./components/AuthPages/Signout.jsx";
 import About from "./components/About.jsx";
 import Contact from "./components/Contact.jsx";
+import JobSeeker from "./JobSeeker.jsx";
+import HiringCompanies from "./HiringCompanies.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -20,7 +23,22 @@ createRoot(document.getElementById("root")).render(
         <Route path="/profile" element={<Profile />}></Route>
         <Route path="/about" element={<About />}></Route>
         <Route path="/contact" element={<Contact />}></Route>
-        {/* <Route path="/workers" element={<Workers />}></Route> */}
+        <Route
+          path="/workers"
+          element={
+            <ProtectedRoute>
+              <JobSeeker />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/find-job"
+          element={
+            <ProtectedRoute>
+              <HiringCompanies />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   </StrictMode>
