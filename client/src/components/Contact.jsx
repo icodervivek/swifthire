@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import { Bounce, toast } from "react-toastify";
+import { Bounce, toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import ContactSvg from "../../public/contact.svg";
+import { motion } from "framer-motion";
 
 const Contact = () => {
   const [name, setName] = useState("");
@@ -45,7 +46,13 @@ const Contact = () => {
       <section className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-12">
         <div className="max-w-7xl w-full flex flex-col md:flex-row items-center justify-center gap-12">
           {/* Left: Form */}
-          <div className="contact-form w-full md:w-1/2 max-w-md bg-[#4639728f] p-8 rounded-lg shadow-md">
+          <motion.div
+            className="contact-form w-full md:w-1/2 max-w-md bg-[#4639728f] p-8 rounded-lg shadow-md"
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-6 text-center">
               Contact Us
             </h2>
@@ -82,17 +89,24 @@ const Contact = () => {
               >
                 Send Message
               </button>
+              <ToastContainer />
             </form>
-          </div>
+          </motion.div>
 
           {/* Right: Image */}
-          <div className="contact-image w-full md:w-1/2 flex justify-center mt-10 md:mt-0">
+          <motion.div
+            className="contact-image w-full md:w-1/2 flex justify-center mt-10 md:mt-0"
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
             <img
               src={ContactSvg}
               alt="Contact Us"
-              className="w-50 sm:w-80 md:mt-30  max-w-sm md:max-w-md"
+              className="w-50 sm:w-80 md:mt-30 max-w-sm md:max-w-md"
             />
-          </div>
+          </motion.div>
         </div>
       </section>
 
