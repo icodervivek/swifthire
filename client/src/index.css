@@ -1,18 +1,10 @@
 @import "tailwindcss";
-/* 
-@font-face {
-  font-family: Freigeist;
-  src: url("/frontend/src/assets/freigeist.otf");
-} */
 
 @font-face {
   font-family: Linear;
   src: url("/frontend/src/assets/linear.otf");
 }
 
-/* @theme {
-  --font-freigeist: Freigeist, "sans-serif";
-} */
 @theme {
   --font-linear: Linear, "sans-serif";
 }
@@ -22,14 +14,38 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    /* overflow-x: hidden; */
   }
+}
+
+.scroll-horizontal::-webkit-scrollbar {
+  height: 10px; /* thickness of horizontal scrollbar */
+}
+
+.scroll-horizontal::-webkit-scrollbar-track {
+  background: #1f1f1f; /* dark track */
+  border-radius: 5px;
+}
+
+.scroll-horizontal::-webkit-scrollbar-thumb {
+  background: #57c785; /* thumb color matching your theme */
+  border-radius: 5px;
+  border: 2px solid #1f1f1f; /* creates a nice inset effect */
+}
+
+.scroll-horizontal::-webkit-scrollbar-thumb:hover {
+  background: #2a7b9b; /* hover effect */
+}
+
+/* Firefox */
+.scroll-horizontal {
+  scrollbar-width: thin;
+  scrollbar-color: #57c785 #1f1f1f;
 }
 
 body {
   background-color: rgb(32, 31, 31);
   color: #fff;
-  
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .navbar {
@@ -64,7 +80,7 @@ body {
 
 .worker {
   background: linear-gradient(90deg, #d53369 0%, #daae51 100%);
-   margin: 0.5rem 0.4rem;
+  margin: 0.5rem 0.4rem;
   padding: 0.8rem 2rem;
   font-weight: bold;
   color: #fff;
@@ -76,33 +92,18 @@ body {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.worker-section{
-  background-color: rgb(33, 75, 70); 
+.worker-section {
+  background-color: rgb(33, 75, 70);
 }
+
 
 body {
-    overflow-x: hidden;
-
+  overflow-x: hidden;
   position: relative;
-  background-color: #201f1f; /* Dark base */
-  isolation: isolate; /* Helps with blending */
-}
-
-body::before {
-  content: "";
-  position: absolute;
-  top: -100px;
-  right: -100px;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(
-    circle,
-    rgba(73, 46, 148, 0.5) 0%,
-    rgba(73, 46, 148, 0) 70%
-  );
-  filter: blur(100px);
-  z-index: -1;
-  pointer-events: none;
+  background: linear-gradient(135deg, #1f1f1f, #130a2c); /* Bluish gradient */
+  min-height: 100vh;
+  margin: 0;
+  font-family: sans-serif;
 }
 
 .dotted-svg {
@@ -148,4 +149,3 @@ body::before {
 .collage-section-header h1 {
   /* overflow-y: hidden; */
 }
-
