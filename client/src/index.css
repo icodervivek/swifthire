@@ -45,7 +45,7 @@
 body {
   background-color: rgb(32, 31, 31);
   color: #fff;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 
 .navbar {
@@ -96,7 +96,6 @@ body {
   background-color: rgb(33, 75, 70);
 }
 
-
 body {
   overflow-x: hidden;
   position: relative;
@@ -146,6 +145,13 @@ body {
   -webkit-filter: grayscale(100); /*  For older Safari */
 }
 
-.collage-section-header h1 {
-  /* overflow-y: hidden; */
+/* Remove arrows from number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
 }
