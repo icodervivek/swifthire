@@ -17,12 +17,14 @@ const FirstSection = () => {
       </p>
 
       <div className="hire-buttons flex flex-row flex-wrap justify-center  mt-4">
+        <Link to="/find-job">
         <button className="hirebtn  cursor-pointer job bg-[#1E4633] w-50 text-white px-6 py-2 rounded-full hover:bg-[#20362c]">
           Find a job
         </button>
+        </Link>
         <Link to="/workers">
           <button className="hirebtn cursor-pointer  worker bg-[#73248b] w-50 text-white px-6 py-2 rounded-full hover:bg-[#402947]">
-            Find a worker
+            Hire for job
           </button>
         </Link>
       </div>
