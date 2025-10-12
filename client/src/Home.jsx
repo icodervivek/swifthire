@@ -6,14 +6,22 @@ import Footer from "./components/Footer";
 
 const App = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex flex-col min-h-screen">
+      {/* Navbar remains sticky or responsive */}
       <Navbar />
 
-      <div className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8">
-        <FirstSection />
-        <CollageSection />
-        <HeroSection />
+      {/* FirstSection full-width, responsive */}
+      <FirstSection />
+
+      {/* Other sections inside responsive container */}
+      <div className="flex-grow w-full px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <CollageSection />
+          <HeroSection />
+        </div>
       </div>
+
+      {/* Footer responsive */}
       <Footer />
     </div>
   );
