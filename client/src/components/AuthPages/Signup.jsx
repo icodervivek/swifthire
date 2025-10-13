@@ -12,9 +12,9 @@ const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [experience, setExperience] = useState("");
-  const [previousJob, setPreviousJob] = useState("");
-  const [contactNumber, setContactNumber] = useState("");
+  // const [experience, setExperience] = useState("");
+  // const [previousJob, setPreviousJob] = useState("");
+  // const [contactNumber, setContactNumber] = useState("");
 
 
   useEffect(() => {
@@ -32,9 +32,9 @@ const Signup = () => {
           name,
           email,
           password,
-          experience,
-          previous_job_role: previousJob,
-          contact_number: contactNumber,
+          // experience,
+          // previous_job_role: previousJob,
+          // contact_number: contactNumber,
         },
         { withCredentials: true }
       );
@@ -96,7 +96,7 @@ const Signup = () => {
                 required
 
               />
-              <input
+              {/* <input
                 type="number"
                 name="experience"
                 placeholder="Experience (months)"
@@ -122,7 +122,7 @@ const Signup = () => {
                 onChange={(e) => setContactNumber(e.target.value)}
                 required
 
-              />
+              /> */}
 
               <button
                 type="submit"
