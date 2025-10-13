@@ -3,8 +3,12 @@ import FirstSection from "./components/FirstSection";
 import CollageSection from "./components/CollageSection";
 import HeroSection from "./components/HeroSection";
 import Footer from "./components/Footer";
+import { useEffect } from "react";
 
 const App = () => {
+  useEffect(() => {
+    document.title = "SwiftHire";
+  }, []);
   return (
     <div className="flex flex-col min-h-screen">
       {/* Navbar remains sticky or responsive */}
