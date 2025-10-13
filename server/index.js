@@ -23,7 +23,14 @@ app.use("/resume", resumeRouter);
 app.use("/recruiter", recruiterRouter);
 
 app.post("/signup", async (req, res) => {
-  const { name, email, password } = req.body;
+  const {
+    name,
+    email,
+    password,
+    experience,
+    previous_job_role,
+    contact_number,
+  } = req.body;
   if (!name || !email || !password)
     return res.status(400).json({ message: "All fields required" });
 
@@ -37,8 +44,16 @@ app.post("/signup", async (req, res) => {
 
     const hashed = await bcrypt.hash(password, 10);
     await pool.query(
-      "INSERT INTO users (name, email, password) VALUES ($1, $2, $3)",
-      [name, email, hashed]
+      `INSERT INTO users (name, email, password, experience, previous_job_role, contact_number)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [
+        name,
+        email,
+        hashed,
+        experience || 0,
+        previous_job_role || null,
+        contact_number || null,
+      ]
     );
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
@@ -79,14 +94,22 @@ app.post("/signin", async (req, res) => {
 app.get("/profile", verifyToken, async (req, res) => {
   try {
     const user = await pool.query(
-      "SELECT id, name, email FROM users WHERE id = $1",
+      `SELECT id, name, email, experience, previous_job_role, contact_number 
+       FROM users WHERE id = $1`,
       [req.user.id]
     );
+
+    if (user.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     res.json({ user: user.rows[0] });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 function verifyToken(req, res, next) {
   const header = req.headers["authorization"];
@@ -143,12 +166,76 @@ app.get("/companies", async (req, res) => {
     res.json({ success: true, data: result.rows });
   } catch (err) {
     console.error("Error fetching companies:", err.message);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Server error while fetching companies",
-      });
+    res.status(500).json({
+      success: false,
+      message: "Server error while fetching companies",
+    });
+  }
+});
+
+app.get("/user/applied-jobs", verifyToken, async (req, res) => {
+  const userId = req.user.id; // from JWT token
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT 
+        j.job_id,
+        j.company_name,
+        j.hiring_for,
+        j.city,
+        j.industry,
+        ja.applied_at
+      FROM job_applications ja
+      JOIN jobs j ON ja.job_id = j.job_id
+      WHERE ja.user_id = $1
+      ORDER BY ja.applied_at DESC
+    `,
+      [userId]
+    );
+
+    res.json({ success: true, appliedJobs: result.rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+app.post("/apply/:jobId", verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  const { jobId } = req.params;
+
+  try {
+    // Check if job exists
+    const job = await pool.query("SELECT * FROM jobs WHERE job_id = $1", [
+      jobId,
+    ]);
+    if (job.rows.length === 0)
+      return res.status(404).json({ success: false, message: "Job not found" });
+
+    // Check if user already applied
+    const existing = await pool.query(
+      "SELECT * FROM job_applications WHERE job_id = $1 AND user_id = $2",
+      [jobId, userId]
+    );
+    if (existing.rows.length > 0)
+      return res
+        .status(400)
+        .json({ success: false, message: "Already applied!" });
+
+    // Insert application
+    await pool.query(
+      "INSERT INTO job_applications (job_id, user_id) VALUES ($1, $2)",
+      [jobId, userId]
+    );
+
+    res.json({
+      success: true,
+      message: "Job Applied Successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
