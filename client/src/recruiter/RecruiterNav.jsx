@@ -25,7 +25,7 @@ const RecruiterNav = () => {
   return (
     <nav className="text-white px-6 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link to="/recruiter">
+        <Link to="/">
           <h1 className="text-2xl font-bold">SwiftHire</h1>
         </Link>
 
