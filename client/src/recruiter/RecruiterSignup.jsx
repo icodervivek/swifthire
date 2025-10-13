@@ -7,6 +7,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify"; // ✅ Toastify
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom"; // ✅ Navigation
+import { useEffect } from "react";
 
 const RecruiterSignup = () => {
   const [formData, setFormData] = useState({
@@ -66,6 +67,11 @@ const RecruiterSignup = () => {
 
   const inputClass =
     "w-full h-11 text-base border border-gray-300 rounded-lg px-4 focus:ring-2 focus:ring-[#1E4633] outline-none";
+
+
+    useEffect(() => {
+        document.title = "Recruiter Sign Up - SwiftHire";
+      }, []);
 
   return (
     <div className="flex flex-col min-h-screen tracking-tightest font-sans">
@@ -235,24 +241,36 @@ const RecruiterSignup = () => {
                   className={`${inputClass} bg-[#252731] text-white`}
                 >
                   <option value="">Select Type</option>
-                  <option value="Software Development">Software Development</option>
+                  <option value="Software Development">
+                    Software Development
+                  </option>
                   <option value="Finance & Banking">Finance & Banking</option>
-                  <option value="Education & Training">Education & Training</option>
+                  <option value="Education & Training">
+                    Education & Training
+                  </option>
                   <option value="Healthcare">Healthcare</option>
                   <option value="Construction">Construction</option>
                   <option value="Manufacturing">Manufacturing</option>
-                  <option value="Marketing & Advertising">Marketing & Advertising</option>
+                  <option value="Marketing & Advertising">
+                    Marketing & Advertising
+                  </option>
                   <option value="Other">Other</option>
                 </select>
               </div>
             </div>
 
             {/* Submit Button */}
-            <motion.div className="text-center" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <motion.div
+              className="text-center"
+              style={{ outline: "none" }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <motion.button
                 type="submit"
                 className="bg-white text-black cursor-pointer rounded-full px-8 py-3 font-semibold hover:bg-gray-200 transition"
                 whileHover={{ backgroundColor: "#e5e5e5" }}
+                style={{ outline: "none" }}
               >
                 Register & Continue
               </motion.button>
