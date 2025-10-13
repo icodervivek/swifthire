@@ -11,9 +11,9 @@ const Profile = () => {
   const [user, setUser] = useState(null);
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-useEffect(() => {
-      document.title = "Profile - SwiftHire";
-    }, []);
+  useEffect(() => {
+    document.title = "Profile - SwiftHire";
+  }, []);
   useEffect(() => {
     const fetchProfileAndAppliedJobs = async () => {
       try {
@@ -28,10 +28,13 @@ useEffect(() => {
           return;
         }
 
-        const profileRes = await axios.get(`${import.meta.env.VITE_API_URL}/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
-        });
+        const profileRes = await axios.get(
+          `${import.meta.env.VITE_API_URL}/profile`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            withCredentials: true,
+          }
+        );
         setUser(profileRes.data.user);
 
         const appliedRes = await axios.get(
@@ -144,25 +147,26 @@ useEffect(() => {
                   You haven’t applied to any jobs yet.
                 </p>
               ) : (
-                <div className="scroll-horizontal overflow-x-auto py-4">
-                  <div className="flex gap-4 min-w-max">
-                    {appliedJobs.map((job) => (
-                      <div
-                        key={job.job_id}
-                        className="bg-gray-800 p-4 rounded-2xl shadow-md hover:scale-105 transition-transform duration-200 min-w-[220px] flex-shrink-0"
-                      >
-                        <h4 className="text-lg font-semibold text-white mb-1">
+                <div className="py-4 space-y-4">
+                  {appliedJobs.map((job) => (
+                    <div
+                      key={job.job_id}
+                      className="bg-gray-800 p-4 rounded-2xl shadow-md hover:scale-105 transition-transform duration-200"
+                    >
+                      <h4 className="text-lg text-white mb-1">
+                        Job Role: &nbsp;
+                        <span className="font-semibold">
                           {job.role || job.hiring_for}
-                        </h4>
-                        <p className="text-gray-300 text-sm">
-                          Company: {job.company_name}
-                        </p>
-                        <p className="text-gray-400 text-xs mt-1">
-                          Status: {job.status || "Applied"}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
+                        </span>
+                      </h4>
+                      <p className="text-gray-300 text-sm">
+                        Company: {job.company_name}
+                      </p>
+                      <p className="text-gray-400 text-xs mt-1">
+                        Status: {job.status || "Applied"}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               )}
             </motion.div>
