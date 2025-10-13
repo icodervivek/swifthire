@@ -7,7 +7,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-import cors from "cors"
+import cors from "cors";
+import { useEffect } from "react";
 
 const RecruiterSignin = () => {
   const [formData, setFormData] = useState({
@@ -26,7 +27,10 @@ const RecruiterSignin = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:3000/recruiter/signin", formData);
+      const res = await axios.post(
+        "http://localhost:3000/recruiter/signin",
+        formData
+      );
 
       // Show success toast
       toast.success(res.data.message, {
@@ -67,6 +71,10 @@ const RecruiterSignin = () => {
   const inputClass =
     "w-full h-11 text-base border border-gray-300 rounded-lg px-4 focus:ring-2 focus:ring-[#1E4633] outline-none";
 
+  useEffect(() => {
+    document.title = "Recruiter Sign In - SwiftHire";
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen tracking-tightest font-sans">
       <RecruiterNav />
@@ -93,7 +101,7 @@ const RecruiterSignin = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            Welcome back to <span className="font-semibold">SwiftHire</span>!  
+            Welcome back to <span className="font-semibold">SwiftHire</span>!
             Please sign in to manage your job postings.
           </motion.p>
 
@@ -121,7 +129,9 @@ const RecruiterSignin = () => {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-semibold mb-1">Password</label>
+              <label className="block text-sm font-semibold mb-1">
+                Password
+              </label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -130,7 +140,6 @@ const RecruiterSignin = () => {
                   onChange={handleChange}
                   required
                   className={`${inputClass} pr-10`}
-                  placeholder="Enter your password"
                 />
                 <button
                   type="button"
@@ -147,10 +156,11 @@ const RecruiterSignin = () => {
               className="text-center"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              style={{ outline: "none" }}
             >
               <motion.button
                 type="submit"
-                className="bg-white text-black cursor-pointer rounded-full px-8 py-3 font-semibold hover:bg-gray-200 transition"
+                className="bg-white text-black cursor-pointer rounded-full px-8 py-3 font-semibold hover:bg-gray-200 transition focus:outline-none focus:ring-0"
                 whileHover={{ backgroundColor: "#e5e5e5" }}
               >
                 Sign In
