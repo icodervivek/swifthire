@@ -221,21 +221,59 @@ router.post("/jobs", verifyToken, async (req, res) => {
 // GET /jobs
 router.get("/jobs", async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const search = req.query.search?.trim() || "";
+    console.log("🔍 Search term received:", search);
+
+    // build base query
+    const baseQuery = supabase
       .from("jobs")
-      .select(
-        `
-        *,
-        recruiters:recruiter_id (organisation_name)
-      `
-      )
+      .select("*")
       .order("created_at", { ascending: false });
 
+    // apply filter only if search is not empty
+    const { data, error } = search
+      ? await baseQuery.ilike("hiring_for", `%${search}%`)
+      : await baseQuery;
+
+    if (error) {
+      console.error("❌ Supabase error:", error);
+      throw error;
+    }
+
+    console.log("✅ Jobs returned:", data?.length);
+    res.status(200).json({ success: true, data });
+  } catch (err) {
+    console.error("🔥 Error fetching jobs:", err.message);
+    res.status(500).json({ success: false, message: "Error fetching jobs" });
+  }
+});
+
+
+
+router.get("/role", async (req, res) => {
+  try {
+    const search = req.query.search || "";
+
+    let query = supabase
+      .from("jobs")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (search) {
+      // Filter by job role only
+      query = query.ilike("hiring_for", `%${search}%`);
+    }
+
+    const { data, error } = await query;
+
     if (error) throw error;
+
     res.status(200).json({ success: true, data });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: "Error fetching jobs" });
+    res
+      .status(500)
+      .json({ success: false, message: "Error fetching jobs by role" });
   }
 });
 
