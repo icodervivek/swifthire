@@ -74,6 +74,7 @@ const Signup = () => {
                 className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                required
               />
               <input
                 type="email"
@@ -82,6 +83,8 @@ const Signup = () => {
                 className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
+
               />
               <input
                 type="password"
@@ -90,6 +93,8 @@ const Signup = () => {
                 className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
+
               />
               <input
                 type="number"
@@ -106,6 +111,7 @@ const Signup = () => {
                 className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 value={previousJob}
                 onChange={(e) => setPreviousJob(e.target.value)}
+                
               />
               <input
                 type="text"
@@ -114,6 +120,8 @@ const Signup = () => {
                 className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 value={contactNumber}
                 onChange={(e) => setContactNumber(e.target.value)}
+                required
+
               />
 
               <button
