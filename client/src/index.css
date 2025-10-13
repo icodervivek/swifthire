@@ -36,6 +36,29 @@
   background: #2a7b9b; /* hover effect */
 }
 
+
+/* Add this CSS in your global CSS file (e.g., index.css or App.css) */
+
+.scrollbar-dark::-webkit-scrollbar {
+  width: 8px; /* width of scrollbar */
+}
+
+.scrollbar-dark::-webkit-scrollbar-track {
+  background: #1f1f1f; /* track color */
+  border-radius: 6px;
+}
+
+.scrollbar-dark::-webkit-scrollbar-thumb {
+  background-color: #333; /* thumb color */
+  border-radius: 6px;
+  border: 2px solid #1f1f1f; /* optional padding around thumb */
+}
+
+.scrollbar-dark {
+  scrollbar-color: #333 #1f1f1f; /* Firefox */
+  scrollbar-width: thin; /* Firefox */
+}
+
 /* Firefox */
 .scroll-horizontal {
   scrollbar-width: thin;
