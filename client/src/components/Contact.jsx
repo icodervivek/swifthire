@@ -5,6 +5,7 @@ import { Bounce, toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import ContactSvg from "../../public/contact.svg";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 
 const Contact = () => {
   const [name, setName] = useState("");
@@ -38,6 +39,10 @@ const Contact = () => {
       });
     }
   };
+
+  useEffect(() => {
+    document.title = "Contact Us - SwiftHire";
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
