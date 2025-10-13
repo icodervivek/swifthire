@@ -180,6 +180,7 @@ router.get("/company", verifyToken, async (req, res) => {
 });
 
 router.post("/jobs", verifyToken, async (req, res) => {
+  const recruiter_id = req.recruiterId; // from verifyToken middleware
   const {
     company_name,
     industry,
@@ -193,11 +194,14 @@ router.post("/jobs", verifyToken, async (req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO companies
-      (company_name, industry, city, contact_email, phone_number, open_positions, hiring_for, immediate_hiring)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `INSERT INTO jobs (
+        recruiter_id, company_name, industry, city, contact_email,
+        phone_number, open_positions, hiring_for, immediate_hiring
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
       RETURNING *`,
       [
+        recruiter_id,
         company_name,
         industry,
         city,
@@ -205,13 +209,113 @@ router.post("/jobs", verifyToken, async (req, res) => {
         phone_number,
         open_positions,
         hiring_for,
-        immediate_hiring === "yes" ? true : false, // convert to boolean
+        immediate_hiring === "yes" ? true : false,
       ]
     );
 
-    res.status(201).json({
-      message: "Job posted successfully",
-      job: result.rows[0],
+    res.status(201).json({ success: true, job: result.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Error posting job" });
+  }
+});
+
+
+router.get("/jobs", async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT jobs.*, recruiters.organisation_name
+       FROM jobs
+       JOIN recruiters ON jobs.recruiter_id = recruiters.recruiter_id
+       ORDER BY jobs.created_at DESC`
+    );
+
+    res.status(200).json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Error fetching jobs" });
+  }
+});
+
+
+router.get("/jobs-with-applicants", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT j.*, COUNT(ja.job_id) AS total_applicants
+      FROM jobs j
+      LEFT JOIN job_applications ja ON j.job_id = ja.job_id
+      GROUP BY j.job_id
+      ORDER BY j.created_at DESC;
+    `);
+
+    res.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Error fetching jobs" });
+  }
+});
+
+
+router.get("/manage-candidates", verifyToken, async (req, res) => {
+  const recruiterId = req.recruiterId; // from middleware
+  try {
+    // Fetch jobs posted by recruiter
+    const jobsResult = await pool.query(
+      `SELECT j.job_id, j.hiring_for, j.company_name, j.open_positions,
+              COUNT(ja.user_id) AS applicants_count
+       FROM jobs j
+       LEFT JOIN job_applications ja ON j.job_id = ja.job_id
+       WHERE j.recruiter_id = $1
+       GROUP BY j.job_id
+       ORDER BY j.created_at DESC`,
+      [recruiterId]
+    );
+
+    const jobs = jobsResult.rows;
+
+    // Fetch users for each job including experience, previous_job_role, contact_number
+    for (let job of jobs) {
+      const usersResult = await pool.query(
+        `SELECT u.id, u.name, u.email, u.experience, u.previous_job_role, u.contact_number, ja.applied_at
+         FROM job_applications ja
+         JOIN users u ON ja.user_id = u.id
+         WHERE ja.job_id = $1
+         ORDER BY ja.applied_at DESC`,
+        [job.job_id]
+      );
+      job.applicants = usersResult.rows;
+    }
+
+    res.json({ success: true, jobs });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// GET /recruiter/job-analytics
+router.get("/job-analytics", verifyToken, async (req, res) => {
+  const recruiterId = req.recruiterId; // from middleware
+
+  try {
+    // Total jobs posted by recruiter
+    const jobRes = await pool.query(
+      "SELECT COUNT(*) AS total_jobs FROM jobs WHERE recruiter_id = $1",
+      [recruiterId]
+    );
+
+    // Total unique applicants applied for recruiter's jobs
+    const applicantRes = await pool.query(
+      `SELECT COUNT(DISTINCT ja.user_id) AS total_applicants
+       FROM job_applications ja
+       JOIN jobs j ON ja.job_id = j.job_id
+       WHERE j.recruiter_id = $1`,
+      [recruiterId]
+    );
+
+    res.json({
+      totalJobs: Number(jobRes.rows[0].total_jobs),
+      totalApplicants: Number(applicantRes.rows[0].total_applicants),
     });
   } catch (err) {
     console.error(err);
@@ -219,24 +323,6 @@ router.post("/jobs", verifyToken, async (req, res) => {
   }
 });
 
-router.get("/post-details", verifyToken, async (req, res) => {
-  try {
-    const recruiterId = req.recruiterId;
 
-    const result = await pool.query(
-       "SELECT * FROM companies WHERE company_name IN (SELECT organisation_name FROM recruiters WHERE recruiter_id = $1)",
-      [recruiterId]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "No job posts found" });
-    }
-
-    res.status(200).json({ jobs: result.rows });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
 
 export default router;
