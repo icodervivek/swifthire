@@ -23,22 +23,27 @@ import ManageCandidate from "./recruiter/ManageCandidate.jsx";
 import JobAnalytics from "./recruiter/JobAnalytics.jsx";
 import NotFound from "./components/NotFound.jsx"; // import the 404 page
 
-
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/signup" element={
-          <PublicRoute>
-            <Signup />
-          </PublicRoute>
-        }></Route>
-        <Route path="/signin" element={
-          <PublicRoute>
-            <Signin />
-          </PublicRoute>
-        }></Route>
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <Signup />
+            </PublicRoute>
+          }
+        ></Route>
+        <Route
+          path="/signin"
+          element={
+            <PublicRoute>
+              <Signin />
+            </PublicRoute>
+          }
+        ></Route>
         <Route path="/profile" element={<Profile />}></Route>
         <Route path="/about" element={<About />}></Route>
         <Route path="/contact" element={<Contact />}></Route>
@@ -99,24 +104,14 @@ createRoot(document.getElementById("root")).render(
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/find-job"
-          element={
-            <ProtectedRoute>
-              <HiringCompanies />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/find-job" element={<HiringCompanies />} />
         <Route
           path="/find-job/upload-resume"
           element={
-            <ProtectedRoute>
               <UploadResume />
-            </ProtectedRoute>
           }
         />
         <Route path="*" element={<NotFound />} />
-
       </Routes>
     </BrowserRouter>
   </StrictMode>
