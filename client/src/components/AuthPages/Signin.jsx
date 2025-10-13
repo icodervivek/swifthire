@@ -4,6 +4,7 @@ import Footer from "../Footer";
 import axios from "axios";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const Signin = () => {
   const navigate = useNavigate();
@@ -34,6 +35,10 @@ const Signin = () => {
       });
     }
   };
+
+  useEffect(() => {
+        document.title = "Sign In - SwiftHire";
+      }, []);
 
   return (
     <>
