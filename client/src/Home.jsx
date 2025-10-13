@@ -4,6 +4,7 @@ import CollageSection from "./components/CollageSection";
 import HeroSection from "./components/HeroSection";
 import Footer from "./components/Footer";
 import { useEffect } from "react";
+import UploadResume from "./UploadResume";
 
 const App = () => {
   useEffect(() => {
@@ -15,7 +16,9 @@ const App = () => {
       <Navbar />
 
       {/* FirstSection full-width, responsive */}
-      <FirstSection />
+      <div className="mt-8">
+        <FirstSection />
+      </div>
 
       {/* Other sections inside responsive container */}
       <div className="flex-grow w-full px-4 sm:px-6 lg:px-8">
