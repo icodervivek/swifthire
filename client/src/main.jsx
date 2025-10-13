@@ -17,14 +17,28 @@ import RecruiterSignup from "./recruiter/RecruiterSignup.jsx";
 import RecruiterSignin from "./recruiter/RecruiterSignin.jsx";
 import ProtectedRecruiterRoute from "./recruiter/ProtectedRecruiterRoute.jsx";
 import PostJob from "./recruiter/PostJob.jsx";
+import PublicRecruiterRoute from "./recruiter/PublicRecruiterRoute.jsx";
+import PublicRoute from "./components/PublicRoute.jsx";
+import ManageCandidate from "./recruiter/ManageCandidate.jsx";
+import JobAnalytics from "./recruiter/JobAnalytics.jsx";
+import NotFound from "./components/NotFound.jsx"; // import the 404 page
+
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<Signup />}></Route>
-        <Route path="/signin" element={<Signin />}></Route>
+        <Route path="/signup" element={
+          <PublicRoute>
+            <Signup />
+          </PublicRoute>
+        }></Route>
+        <Route path="/signin" element={
+          <PublicRoute>
+            <Signin />
+          </PublicRoute>
+        }></Route>
         <Route path="/profile" element={<Profile />}></Route>
         <Route path="/about" element={<About />}></Route>
         <Route path="/contact" element={<Contact />}></Route>
@@ -44,9 +58,39 @@ createRoot(document.getElementById("root")).render(
             </ProtectedRecruiterRoute>
           }
         ></Route>
+        <Route
+          path="/recruiter/job-analytics"
+          element={
+            <ProtectedRecruiterRoute>
+              <JobAnalytics />
+            </ProtectedRecruiterRoute>
+          }
+        ></Route>
 
-        <Route path="/recruiter/signup" element={<RecruiterSignup />}></Route>
-        <Route path="/recruiter/signin" element={<RecruiterSignin />}></Route>
+        <Route
+          path="/recruiter/signup"
+          element={
+            <PublicRecruiterRoute>
+              <RecruiterSignup />
+            </PublicRecruiterRoute>
+          }
+        ></Route>
+        <Route
+          path="/recruiter/signin"
+          element={
+            <PublicRecruiterRoute>
+              <RecruiterSignin />
+            </PublicRecruiterRoute>
+          }
+        ></Route>
+        <Route
+          path="/recruiter/manage-candidate"
+          element={
+            <ProtectedRecruiterRoute>
+              <ManageCandidate />
+            </ProtectedRecruiterRoute>
+          }
+        ></Route>
         <Route
           path="/workers"
           element={
@@ -71,6 +115,8 @@ createRoot(document.getElementById("root")).render(
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<NotFound />} />
+
       </Routes>
     </BrowserRouter>
   </StrictMode>
