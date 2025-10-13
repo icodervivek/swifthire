@@ -27,6 +27,7 @@ const PostJob = () => {
   useEffect(() => {
     const fetchCompanyName = async () => {
       try {
+        document.title = "Post Job"
         const token = localStorage.getItem("recruiterToken");
         if (!token) return console.error("No token in localStorage");
 
