@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { Upload, FileText, CheckCircle, XCircle } from "lucide-react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import { useEffect } from "react";
 
 const UploadResume = () => {
+
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
@@ -59,6 +61,10 @@ const UploadResume = () => {
     setMatchedJobs([]);
     setSkills([]);
   };
+
+  useEffect(() => {
+        document.title = "Upload PDF - SwiftHire";
+      }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0b0b0b] text-white">
