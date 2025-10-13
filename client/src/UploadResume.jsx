@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Upload, FileText, CheckCircle, XCircle } from "lucide-react";
+import axios from "axios";
+import { toast, Bounce } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -10,6 +13,8 @@ const UploadResume = () => {
   const [matchedJobs, setMatchedJobs] = useState([]);
   const [skills, setSkills] = useState([]);
   const [uploadData, setUploadData] = useState(null);
+  const [appliedJobs, setAppliedJobs] = useState([]);
+  const navigate = useNavigate();
   const inputRef = useRef(null);
 
   // Handle file selection
@@ -79,16 +84,63 @@ const UploadResume = () => {
     setSkills([]);
   };
 
+  const handleApply = async (jobId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/apply/${jobId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      toast.success(res.data.message || "Application submitted!", {
+        position: "top-center",
+        autoClose: 2000,
+        transition: Bounce,
+      });
+
+      setAppliedJobs((prev) => [...prev, jobId]);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong", {
+        position: "top-center",
+        autoClose: 2000,
+        transition: Bounce,
+      });
+    }
+  };
+
   useEffect(() => {
     document.title = "Upload PDF - SwiftHire";
+
+    const fetchAppliedJobs = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/user/applied-jobs`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const appliedJobIds = res.data.appliedJobs.map((job) =>
+          Number(job.job_id)
+        );
+        setAppliedJobs(appliedJobIds);
+      } catch (err) {
+        console.error("Error fetching applied jobs:", err);
+      }
+    };
+
+    fetchAppliedJobs();
   }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0b0b0b] text-white">
       <Navbar />
-
       {/* ===== Upload Form Container ===== */}
-      <div className="flex-grow flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-16">
+      <div className="flex-grow flex flex-col items-center mt-12 justify-center px-4 sm:px-6 lg:px-8 py-16">
         <div className="bg-gray-900/80 border border-[#57c785] rounded-3xl shadow-xl p-10 sm:p-12 md:p-16 w-full max-w-lg text-center backdrop-blur-lg">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#57c785] mb-6">
             Upload Your Resume
@@ -197,13 +249,33 @@ const UploadResume = () => {
                   <p className="text-gray-400">
                     Contact: {job.contact_email || "N/A"}
                   </p>
+                  <div className="mt-4 flex justify-center">
+                    {appliedJobs.includes(Number(job.job_id)) ? (
+                      <button
+                        disabled
+                        className="px-6 py-2 w-full rounded-full text-sm font-semibold bg-gray-600 cursor-not-allowed"
+                      >
+                        Applied
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          const token = localStorage.getItem("token");
+                          if (token) handleApply(job.job_id);
+                          else navigate("/signin");
+                        }}
+                        className="px-6 py-2 w-full rounded-full text-sm font-semibold bg-green-600 hover:bg-green-700 text-white cursor-pointer transition-colors"
+                      >
+                        Apply Now
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
       )}
-
       <Footer />
     </div>
   );
