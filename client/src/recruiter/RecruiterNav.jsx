@@ -47,11 +47,6 @@ const RecruiterNav = () => {
             </>
           ) : (
             <>
-              <Link to="/recruiter/signup">
-                <button className="bg-[#160a80] cursor-pointer text-white rounded-full px-5 py-2 hover:bg-[#0a14a7] transition">
-                  Sign Up
-                </button>
-              </Link>
               <Link to="/recruiter/signin">
                 <button className="bg-[#0c6b34] cursor-pointer text-white rounded-full px-5 py-2 hover:bg-[#0d8d42] transition">
                   Sign In
@@ -104,14 +99,6 @@ const RecruiterNav = () => {
             </>
           ) : (
             <>
-              <Link
-                to="/recruiter/signup"
-                className="w-full flex justify-center"
-              >
-                <button className="w-11/12 bg-[#1E4633] text-white rounded-full px-5 py-2 hover:bg-[#20362c] transition cursor-pointer">
-                  Sign Up
-                </button>
-              </Link>
               <Link
                 to="/recruiter/signin"
                 className="w-full flex justify-center"

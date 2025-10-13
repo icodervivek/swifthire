@@ -166,6 +166,15 @@ const RecruiterSignin = () => {
                 Sign In
               </motion.button>
             </motion.div>
+               <p className="text-center text-gray-400 mt-4">
+              Don't have an account?{" "}
+              <span
+                onClick={() => navigate("/recruiter/signup")}
+                className="text-white font-semibold cursor-pointer hover:underline"
+              >
+                Sign Up Now
+              </span>
+            </p>
           </motion.form>
         </motion.div>
       </main>
