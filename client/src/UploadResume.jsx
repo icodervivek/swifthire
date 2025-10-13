@@ -1,17 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Upload, FileText, CheckCircle, XCircle } from "lucide-react";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import { useEffect } from "react";
 
 const UploadResume = () => {
-
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
   const [matchedJobs, setMatchedJobs] = useState([]);
   const [skills, setSkills] = useState([]);
+  const [uploadData, setUploadData] = useState(null);
+  const inputRef = useRef(null);
 
+  // Handle file selection
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
     if (selected && selected.type === "application/pdf") {
@@ -24,6 +25,26 @@ const UploadResume = () => {
     }
   };
 
+  // Handle drag & drop
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile && droppedFile.type === "application/pdf") {
+      setFile(droppedFile);
+      setUploaded(false);
+      setMatchedJobs([]);
+      setSkills([]);
+    } else {
+      alert("Please upload a PDF file only!");
+    }
+  };
+
+  // Trigger file input click programmatically
+  const handleClickUploadArea = () => {
+    if (inputRef.current) inputRef.current.click();
+  };
+
+  // Handle file upload to backend
   const handleUpload = async () => {
     if (!file) return alert("Please select a file first!");
     setUploading(true);
@@ -41,13 +62,9 @@ const UploadResume = () => {
       setUploading(false);
       setUploaded(true);
 
-      if (data.matchedJobs) {
-        setMatchedJobs(data.matchedJobs);
-        setSkills(data.skills || []);
-      } else {
-        setMatchedJobs([]);
-        setSkills([]);
-      }
+      setUploadData(data);
+      setMatchedJobs(data.matchedJobs || []);
+      setSkills(data.extractedSkills || []);
     } catch (err) {
       console.error(err);
       setUploading(false);
@@ -63,8 +80,8 @@ const UploadResume = () => {
   };
 
   useEffect(() => {
-        document.title = "Upload PDF - SwiftHire";
-      }, []);
+    document.title = "Upload PDF - SwiftHire";
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0b0b0b] text-white">
@@ -83,21 +100,23 @@ const UploadResume = () => {
 
           {/* File Upload Area */}
           {!file ? (
-            <label
-              htmlFor="file-upload"
+            <div
+              onClick={handleClickUploadArea}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={handleDrop}
               className="cursor-pointer border-2 border-dashed border-[#57c785] rounded-xl py-12 flex flex-col items-center justify-center transition-all hover:bg-[#57c785]/10"
             >
               <Upload className="w-12 h-12 text-[#57c785] mb-3" />
               <p className="text-gray-300">Click to upload or drag & drop</p>
               <p className="text-sm text-gray-500">Only PDF files allowed</p>
               <input
-                id="file-upload"
+                ref={inputRef}
                 type="file"
                 accept="application/pdf"
                 onChange={handleFileChange}
                 className="hidden"
               />
-            </label>
+            </div>
           ) : (
             <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 text-left relative">
               <div className="flex items-center gap-3">
@@ -158,26 +177,29 @@ const UploadResume = () => {
               : "No Matching Job Recommendations Found"}
           </h3>
 
+          {uploadData?.description && (
+            <p className="text-gray-400 mb-6">{uploadData.description}</p>
+          )}
+
           {matchedJobs.length > 0 && (
-            <>
-              <p className="text-gray-400 mb-6">
-                Based on extracted skills: {skills.join(", ")}
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {matchedJobs.map((job) => (
-                  <div
-                    key={job.id}
-                    className="p-6 border border-gray-700 rounded-lg hover:bg-gray-700 transition"
-                  >
-                    <p className="font-semibold text-lg">{job.company_name}</p>
-                    <p className="text-gray-400">Role: {job.hiring_for}</p>
-                    <p className="text-gray-400">City: {job.city}</p>
-                    <p className="text-gray-400">Open Positions: {job.open_positions}</p>
-                    <p className="text-gray-400">Contact: {job.contact_email}</p>
-                  </div>
-                ))}
-              </div>
-            </>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {matchedJobs.map((job) => (
+                <div
+                  key={job.job_id}
+                  className="p-6 border border-gray-700 rounded-lg hover:bg-gray-700 transition"
+                >
+                  <p className="font-semibold text-lg">{job.company_name}</p>
+                  <p className="text-gray-400">Role: {job.hiring_for}</p>
+                  <p className="text-gray-400">City: {job.city}</p>
+                  <p className="text-gray-400">
+                    Open Positions: {job.open_positions || "N/A"}
+                  </p>
+                  <p className="text-gray-400">
+                    Contact: {job.contact_email || "N/A"}
+                  </p>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       )}

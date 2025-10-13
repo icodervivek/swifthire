@@ -4,7 +4,7 @@ import pdf from "pdf-parse-new";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { LLMChain } from "langchain/chains";
 import { PromptTemplate } from "@langchain/core/prompts";
-import pool from "../db.js"; // your DB connection file
+import { supabase } from "../supabaseClient.js"; // Supabase client
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -42,12 +42,13 @@ Given:
 Match the candidate to the most relevant jobs.
 
 Return a **pure JSON array** in this format (no markdown, no text):
+
 [
   {{
-    "job_id": <job_id>,
-    "job_title": "<job_title>",
-    "match_reason": "<why this fits>",
-    "confidence": <1-10>
+    "job_id": 0,
+    "job_title": "Job Title",
+    "match_reason": "Reason why this candidate fits",
+    "confidence": 0
   }}
 ]
 `,
@@ -64,9 +65,7 @@ const jobMatchChain = new LLMChain({ llm: model, prompt: jobMatchPrompt });
 // ✅ Upload Resume Route
 router.post("/upload", upload.single("pdf"), async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded." });
-    }
+    if (!req.file) return res.status(400).json({ error: "No file uploaded." });
 
     // Step 1: Extract PDF Text
     const data = await pdf(req.file.buffer);
@@ -77,18 +76,30 @@ router.post("/upload", upload.single("pdf"), async (req, res) => {
     let extractedSkills = [];
 
     try {
-      extractedSkills = JSON.parse(skillRes.text.trim());
+      let cleanedText = skillRes.text
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .replace(/^json\s*/i, "")
+        .trim();
+      extractedSkills = JSON.parse(cleanedText);
     } catch {
       extractedSkills = skillRes.text
+        .replace(/^json\s*/i, "")
         .split(/,|\n|;/)
-        .map((s) => s.trim())
+        .map((s) => s.replace(/[`[\]]/g, "").trim())
         .filter(Boolean);
     }
 
-    // Step 3: Fetch Jobs from DB
-    const { rows: jobs } = await pool.query(
-      `SELECT job_id, hiring_for, company_name, city, industry FROM jobs`
-    );
+    const cleanSkills = extractedSkills.map((s) => s.trim()).filter(Boolean);
+
+    // Step 3: Fetch Jobs
+    const { data: jobs, error } = await supabase
+      .from("jobs")
+      .select(
+        "job_id, hiring_for, company_name, city, industry, open_positions, contact_email"
+      );
+
+    if (error) return res.status(500).json({ error: "Failed to fetch jobs." });
 
     // Step 4: Match Jobs using LLM
     const jobsData = JSON.stringify(
@@ -98,31 +109,28 @@ router.post("/upload", upload.single("pdf"), async (req, res) => {
         company: job.company_name,
         city: job.city,
         industry: job.industry,
+        open_positions: job.open_positions,
+        contact: job.contact_email,
       }))
     );
 
     const matchRes = await jobMatchChain.call({
-      skills: extractedSkills.join(", "),
+      skills: cleanSkills.join(", "),
       jobs: jobsData,
     });
 
     // Step 5: Parse Matches
-    // Step 5: Parse Matches (robust)
     let matches = [];
     try {
-      // Clean unwanted markdown or code fences
       const cleanedText = matchRes.text
         .replace(/```json/g, "")
         .replace(/```/g, "")
-        .replace(/^.*?\[/s, "[") // start from first [
-        .replace(/]([^]*?)$/s, "]") // end at last ]
+        .replace(/^.*?\[/s, "[")
+        .replace(/]([^]*?)$/s, "]")
         .trim();
-
       matches = JSON.parse(cleanedText);
-
-      if (!Array.isArray(matches)) {
-        throw new Error("AI response is not a JSON array");
-      }
+      if (!Array.isArray(matches))
+        throw new Error("AI response is not an array");
     } catch (err) {
       console.warn("AI match JSON parse failed:", err);
       matches = [
@@ -149,11 +157,23 @@ router.post("/upload", upload.single("pdf"), async (req, res) => {
       })
       .filter(Boolean);
 
+    // Step 7: Create clean description
+    const description =
+      matchedJobs.length > 0
+        ? `Based on your skills (${cleanSkills.join(
+            ", "
+          )}), these jobs are available.`
+        : `No strong matches found for your skills (${cleanSkills.join(
+            ", "
+          )}).`;
+
+    // ✅ Send single response
     res.json({
       message: matchedJobs.length
         ? "Job recommendations found."
         : "No strong matches found.",
-      extractedSkills,
+      description,
+      extractedSkills: cleanSkills,
       matchedJobs,
     });
   } catch (err) {
