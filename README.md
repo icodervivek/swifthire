@@ -3,18 +3,17 @@
 ![React](https://img.shields.io/badge/Frontend-React-blue?logo=react)
 ![Node.js](https://img.shields.io/badge/Backend-Node.js-green?logo=node.js)
 ![Express](https://img.shields.io/badge/Framework-Express-black?logo=express)
-![PostgreSQL](https://img.shields.io/badge/Database-Neon%20\(PostgreSQL\)-blue?logo=postgresql)
+![Database](https://img.shields.io/badge/Database-Supabase-blue?logo=supabase)
 ![Status](https://img.shields.io/badge/Status-In%20Development-orange)
 
 **SwiftHire makes hiring easy!**
 Whether you're a recruiter looking to fill positions quickly or a job seeker searching for the perfect opportunity, SwiftHire makes the entire hiring process intelligent, fast, and seamless. With AI-driven job recommendations and recruiter-centric management tools, you can find the right match — every time.
 
-
 ---
 
 ## 🛠 Features
 
-* ⚡ **AI-Based Job Recommendations:** Intelligent suggestions for job seekers based on skills, experience, and preferences using Google Gemini 2.0 Flash API.
+* ⚡ **AI-Based Job Recommendations:** Intelligent suggestions for job seekers based on skills, experience, and preferences using Google Gemini 2.0 Flash API with **LangChain** integration.
 * 💼 **Recruiter Management:** Recruiters can post job requirements, manage listings, and track applications for their organization.
 * 🏢 **Company Hiring Dashboard:** View recent job postings, open positions, and applicants in a single dashboard.
 * 📱 **Responsive UI:** Clean, modern design for seamless experience on all devices.
@@ -29,8 +28,8 @@ Whether you're a recruiter looking to fill positions quickly or a job seeker sea
 | -------- | -------------------------------------------------- |
 | Frontend | React, Tailwind CSS                                |
 | Backend  | Node.js, Express.js                                |
-| Database | Neon (PostgreSQL)                                  |
-| AI       | Job Recommendation Engine using Google Gemini 2.0 Flash API |
+| Database | Supabase (PostgreSQL)                              |
+| AI       | Job Recommendation Engine using Google Gemini 2.0 Flash API + LangChain |
 | API      | RESTful APIs with JWT authentication               |
 
 ---
@@ -65,10 +64,18 @@ npm install
 Create a `.env` file in the backend:
 
 ```env
-PORT=3000
-DATABASE_URL=your_neon_db_url
-JWT_SECRET=your_secret_key
-GOOGLE_API_KEY=your_gemini_api_key  # for AI-based job recommendations
+PORT=3000                      # The port your backend server will run on (e.g., 3000)
+SUPABASE_URL=https://xyz.supabase.co  # Your Supabase project URL (found in your Supabase dashboard)
+SUPABASE_SERVICE_KEY=your_service_role_key  # Supabase API key with service role or anon key for server-side access
+JWT_SECRET=your_secret_key      # Secret key used to sign JWT tokens for authentication
+GOOGLE_API_KEY=your_gemini_api_key  # API key for Google Gemini (used for AI-based job recommendations)
+FRONTEND_ORIGIN=http://localhost:5173  # URL of your frontend (used for CORS)
+```
+
+Create a `.env` file in the client:
+
+```env
+VITE_API_URL=http://localhost:3000  # URL where your backend is running (used for API calls from frontend)
 ```
 
 ### 4. Run the application
@@ -106,7 +113,7 @@ swifthire/
 ## ⚡ Usage
 
 * 🔑 **Sign Up / Sign In**: Create an account or login to access profile and hire workers.
-* 🧑‍💼 **Job Seekers**: View available jobs, get AI-based recommendations tailored to skills and experience using Google Gemini 2.0 Flash API.
+* 🧑‍💼 **Job Seekers**: View available jobs, get AI-based recommendations tailored to skills and experience using Google Gemini 2.0 Flash API + LangChain.
 * 🏢 **Hiring Companies / Recruiters**: Post job requirements, manage listings, track applications, and maintain organization-specific job data.
 * 📩 **Contact Form**: Submit queries or feedback directly from the app.
 * 👤 **Profile Page**: View and manage your account details securely.
@@ -120,4 +127,5 @@ Feel free to check the [issues page](https://github.com/icodervivek/swifthire/is
 
 ---
 
-**SwiftHire** – Making hiring simple, fast, and reliable with AI-powered job recommendations and recruiter management using Google Gemini 2.0 Flash API. 💼✨
+**SwiftHire** – Making hiring simple, fast, and reliable with AI-powered job recommendations and recruiter management using Google Gemini 2.0 Flash API + LangChain. 💼✨
+
