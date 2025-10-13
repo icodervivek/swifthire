@@ -3,58 +3,60 @@ import dotenv from "dotenv";
 import cors from "cors";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import pool from "./db.js";
+import { supabase } from "./supabaseClient.js";
 
 import resumeRouter from "./routes/resumeRouter.js";
 import recruiterRouter from "./routes/recruiterRouter.js";
 
 dotenv.config();
-
 const app = express();
+
 app.use(express.json());
 app.use(
   cors({
     origin: process.env.FRONTEND_ORIGIN,
-    credentials: true, // allow cookies or auth headers
+    credentials: true,
   })
 );
 
+// Routes
 app.use("/resume", resumeRouter);
 app.use("/recruiter", recruiterRouter);
 
+// -----------------------
+// Auth: Signup
+// -----------------------
 app.post("/signup", async (req, res) => {
-  const {
-    name,
-    email,
-    password,
-    experience,
-    previous_job_role,
-    contact_number,
-  } = req.body;
+  const { name, email, password, experience, previous_job_role, contact_number } =
+    req.body;
+
   if (!name || !email || !password)
     return res.status(400).json({ message: "All fields required" });
 
   try {
-    const userExists = await pool.query(
-      "SELECT * FROM users WHERE email = $1",
-      [email]
-    );
-    if (userExists.rows.length > 0)
-      return res.status(400).json({ message: "User already exists" });
+    const { data: existingUser, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
+
+    if (existingUser) return res.status(400).json({ message: "User exists" });
 
     const hashed = await bcrypt.hash(password, 10);
-    await pool.query(
-      `INSERT INTO users (name, email, password, experience, previous_job_role, contact_number)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [
+
+    const { data, error: insertError } = await supabase.from("users").insert([
+      {
         name,
         email,
-        hashed,
-        experience || 0,
-        previous_job_role || null,
-        contact_number || null,
-      ]
-    );
+        password: hashed,
+        experience: experience || 0,
+        previous_job_role: previous_job_role || null,
+        contact_number: contact_number || null,
+      },
+    ]);
+
+    if (insertError) throw insertError;
+
     res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
     console.error(err);
@@ -62,55 +64,188 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+// -----------------------
+// Auth: Signin
+// -----------------------
 app.post("/signin", async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password)
     return res.status(400).json({ message: "All fields required" });
 
   try {
-    const result = await pool.query("SELECT * FROM users WHERE email = $1", [
-      email,
-    ]);
-    if (result.rows.length === 0)
-      return res.status(400).json({ message: "User not found" });
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
 
-    const user = result.rows[0];
+    if (!user) return res.status(400).json({ message: "User not found" });
+
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(401).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
-    res.json({ message: "Sign In Successful !", token });
+    res.json({ message: "Sign In Successful!", token });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Database error" });
   }
 });
 
+// -----------------------
+// Profile
+// -----------------------
 app.get("/profile", verifyToken, async (req, res) => {
   try {
-    const user = await pool.query(
-      `SELECT id, name, email, experience, previous_job_role, contact_number 
-       FROM users WHERE id = $1`,
-      [req.user.id]
-    );
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("id, name, email, experience, previous_job_role, contact_number")
+      .eq("id", req.user.id)
+      .single();
 
-    if (user.rows.length === 0) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    res.json({ user: user.rows[0] });
+    res.json({ user });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
+// -----------------------
+// Contact form
+// -----------------------
+app.post("/contact", async (req, res) => {
+  const { name, email, message } = req.body;
 
+  if (!name || !email || !message)
+    return res.status(400).json({ message: "All fields required!" });
+
+  try {
+    const { data, error } = await supabase
+      .from("contacts")
+      .insert([{ name, email, message }])
+      .select();
+
+    if (error) throw error;
+
+    res.json({ message: "Message sent successfully!", contact: data[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// -----------------------
+// Get all companies
+// -----------------------
+app.get("/companies", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("companies")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error while fetching companies" });
+  }
+});
+
+// -----------------------
+// Job seekers
+// -----------------------
+app.get("/job-seekers", async (req, res) => {
+  try {
+    const { data, error } = await supabase.from("job_seekers").select("*").order("id");
+    if (error) throw error;
+    res.status(200).json(data);
+  } catch (err) {
+    console.error("Error fetching job seekers:", err);
+    res.status(500).json({ message: "Error fetching job seekers" });
+  }
+});
+
+// -----------------------
+// Applied Jobs
+// -----------------------
+app.get("/user/applied-jobs", verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const { data, error } = await supabase
+      .from("job_applications")
+      .select(`
+        job_id,
+        jobs (company_name, hiring_for, city, industry),
+        applied_at
+      `)
+      .eq("user_id", userId)
+      .order("applied_at", { ascending: false });
+
+    if (error) throw error;
+
+    const appliedJobs = data.map((item) => ({
+      job_id: item.job_id,
+      company_name: item.jobs.company_name,
+      hiring_for: item.jobs.hiring_for,
+      city: item.jobs.city,
+      industry: item.jobs.industry,
+      applied_at: item.applied_at,
+    }));
+
+    res.json({ success: true, appliedJobs });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// -----------------------
+// Apply for Job
+// -----------------------
+app.post("/apply/:jobId", verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  const { jobId } = req.params;
+
+  try {
+    const { data: job, error: jobError } = await supabase
+      .from("jobs")
+      .select("*")
+      .eq("job_id", jobId)
+      .single();
+
+    if (!job) return res.status(404).json({ success: false, message: "Job not found" });
+
+    const { data: existing, error: existError } = await supabase
+      .from("job_applications")
+      .select("*")
+      .eq("job_id", jobId)
+      .eq("user_id", userId);
+
+    if (existing.length > 0)
+      return res.status(400).json({ success: false, message: "Already applied!" });
+
+    const { data: applied, error: applyError } = await supabase
+      .from("job_applications")
+      .insert([{ job_id: jobId, user_id: userId }]);
+
+    if (applyError) throw applyError;
+
+    res.json({ success: true, message: "Job Applied Successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// -----------------------
+// JWT middleware
+// -----------------------
 function verifyToken(req, res, next) {
   const header = req.headers["authorization"];
   if (!header) return res.status(403).json({ message: "No token provided" });
@@ -123,122 +258,7 @@ function verifyToken(req, res, next) {
   });
 }
 
-app.post("/contact", async (req, res) => {
-  const { name, email, message } = req.body;
-
-  if (!name || !email || !message) {
-    return res.status(400).json({ message: "All fields are required!" });
-  }
-
-  try {
-    const result = await pool.query(
-      "INSERT INTO contacts (name, email, message) VALUES ($1, $2, $3) RETURNING *",
-      [name, email, message]
-    );
-
-    res.json({
-      message: "Message sent successfully!",
-      contact: result.rows[0],
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-app.get("/job-seekers", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT * FROM job_seekers ORDER BY id ASC"
-    );
-    res.status(200).json(result.rows);
-  } catch (err) {
-    console.error("Error fetching job seekers:", err);
-    res.status(500).json({ message: "Error fetching job seekers" });
-  }
-});
-
-app.get("/companies", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT * FROM companies ORDER BY created_at DESC"
-    );
-    res.json({ success: true, data: result.rows });
-  } catch (err) {
-    console.error("Error fetching companies:", err.message);
-    res.status(500).json({
-      success: false,
-      message: "Server error while fetching companies",
-    });
-  }
-});
-
-app.get("/user/applied-jobs", verifyToken, async (req, res) => {
-  const userId = req.user.id; // from JWT token
-
-  try {
-    const result = await pool.query(
-      `
-      SELECT 
-        j.job_id,
-        j.company_name,
-        j.hiring_for,
-        j.city,
-        j.industry,
-        ja.applied_at
-      FROM job_applications ja
-      JOIN jobs j ON ja.job_id = j.job_id
-      WHERE ja.user_id = $1
-      ORDER BY ja.applied_at DESC
-    `,
-      [userId]
-    );
-
-    res.json({ success: true, appliedJobs: result.rows });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
-});
-
-app.post("/apply/:jobId", verifyToken, async (req, res) => {
-  const userId = req.user.id;
-  const { jobId } = req.params;
-
-  try {
-    // Check if job exists
-    const job = await pool.query("SELECT * FROM jobs WHERE job_id = $1", [
-      jobId,
-    ]);
-    if (job.rows.length === 0)
-      return res.status(404).json({ success: false, message: "Job not found" });
-
-    // Check if user already applied
-    const existing = await pool.query(
-      "SELECT * FROM job_applications WHERE job_id = $1 AND user_id = $2",
-      [jobId, userId]
-    );
-    if (existing.rows.length > 0)
-      return res
-        .status(400)
-        .json({ success: false, message: "Already applied!" });
-
-    // Insert application
-    await pool.query(
-      "INSERT INTO job_applications (job_id, user_id) VALUES ($1, $2)",
-      [jobId, userId]
-    );
-
-    res.json({
-      success: true,
-      message: "Job Applied Successfully",
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
-});
-
+// -----------------------
 app.listen(process.env.PORT, () =>
   console.log(`🚀 Server running on port ${process.env.PORT}`)
 );
