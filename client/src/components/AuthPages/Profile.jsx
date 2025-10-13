@@ -28,14 +28,14 @@ useEffect(() => {
           return;
         }
 
-        const profileRes = await axios.get("http://localhost:3000/profile", {
+        const profileRes = await axios.get(`${import.meta.env.VITE_API_URL}/profile`, {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
         setUser(profileRes.data.user);
 
         const appliedRes = await axios.get(
-          "http://localhost:3000/user/applied-jobs",
+          `${import.meta.env.VITE_API_URL}/user/applied-jobs`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

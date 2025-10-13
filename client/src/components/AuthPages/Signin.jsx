@@ -15,7 +15,7 @@ const Signin = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:3000/signin"
+        `${import.meta.env.VITE_API_URL}/signin`
         ,
         { email, password },
         { withCredentials: true }

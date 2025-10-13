@@ -17,12 +17,12 @@ const HiringCompanies = () => {
     const fetchCompaniesAndAppliedJobs = async () => {
       try {
         document.title = "Find Jobs - SwiftHire";
-        const jobsRes = await axios.get("http://localhost:3000/recruiter/jobs");
+        const jobsRes = await axios.get(`${import.meta.env.VITE_API_URL}/recruiter/jobs`);
         setCompanies(jobsRes.data.data);
 
         const token = localStorage.getItem("token");
         const appliedRes = await axios.get(
-          "http://localhost:3000/user/applied-jobs",
+          `${import.meta.env.VITE_API_URL}/user/applied-jobs`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -55,7 +55,7 @@ const HiringCompanies = () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        `http://localhost:3000/apply/${jobId}`,
+        `${import.meta.env.VITE_API_URL}/apply/${jobId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

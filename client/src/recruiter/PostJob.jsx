@@ -31,7 +31,7 @@ const PostJob = () => {
         const token = localStorage.getItem("recruiterToken");
         if (!token) return console.error("No token in localStorage");
 
-        const res = await axios.get("http://localhost:3000/recruiter/company", {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/recruiter/company`, {
           headers: { Authorization: `Bearer ${token}` }, // ✅ correct format
         });
         setCompanyName(res.data.company_name);
@@ -60,7 +60,7 @@ const PostJob = () => {
     try {
       const token = localStorage.getItem("recruiterToken");
 
-      const res = await axios.post("http://localhost:3000/recruiter/jobs", formData, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/recruiter/jobs`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

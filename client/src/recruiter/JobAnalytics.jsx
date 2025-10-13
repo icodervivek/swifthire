@@ -19,7 +19,7 @@ const JobAnalytics = () => {
         if (!token) return;
 
         const res = await axios.get(
-          "http://localhost:3000/recruiter/job-analytics",
+          `${import.meta.env.VITE_API_URL}/recruiter/job-analytics`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 

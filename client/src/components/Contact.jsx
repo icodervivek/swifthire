@@ -17,7 +17,7 @@ const Contact = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/contact",
+        `${import.meta.env.VITE_API_URL}/contact`,
         { name, email, message },
         { withCredentials: true }
       );

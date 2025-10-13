@@ -32,7 +32,7 @@ const UploadResume = () => {
       const formData = new FormData();
       formData.append("pdf", file);
 
-      const res = await fetch("http://localhost:3000/resume/upload", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/resume/upload`, {
         method: "POST",
         body: formData,
       });

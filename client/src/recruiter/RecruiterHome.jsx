@@ -17,7 +17,7 @@ const RecruiterHome = () => {
         const token = localStorage.getItem("recruiterToken");
         if (!token) return;
 
-        const res = await axios.get("http://localhost:3000/recruiter/jobs", {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/recruiter/jobs`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

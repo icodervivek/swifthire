@@ -19,7 +19,7 @@ const ManageCandidate = () => {
         if (!token) return;
 
         const res = await axios.get(
-          "http://localhost:3000/recruiter/manage-candidates",
+          `${import.meta.env.VITE_API_URL}/recruiter/manage-candidates`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

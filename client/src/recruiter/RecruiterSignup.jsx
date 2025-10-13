@@ -33,7 +33,7 @@ const RecruiterSignup = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/recruiter/signup",
+        `${import.meta.env.VITE_API_URL}/recruiter/signup`,
         formData
       );
 

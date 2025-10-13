@@ -28,7 +28,7 @@ const RecruiterSignin = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/recruiter/signin",
+        `${import.meta.env.VITE_API_URL}/recruiter/signin`,
         formData
       );
 
