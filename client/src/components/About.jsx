@@ -3,8 +3,12 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import AboutSvg from "../../public/about.svg";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 
 const About = () => {
+  useEffect(() => {
+    document.title = "About Us - SwiftHire";
+  }, []);
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -39,10 +43,15 @@ const About = () => {
               About SwiftHire
             </h2>
             <p className="text-[#a39999] text-base sm:text-lg mb-4">
-              SwiftHire is a platform dedicated to connecting talented individuals with meaningful opportunities. Our mission is to make hiring easy and efficient for both employers and job seekers.
+              SwiftHire is a platform dedicated to connecting talented
+              individuals with meaningful opportunities. Our mission is to make
+              hiring easy and efficient for both employers and job seekers.
             </p>
             <p className="text-[#a39999] text-base sm:text-lg mb-6">
-              Whether you’re looking for a full-time role, part-time job, or freelance project, SwiftHire prioritizes skill and talent over resumes. We leverage data-driven matching and skill-first assessments to ensure the right fit for every opportunity.
+              Whether you’re looking for a full-time role, part-time job, or
+              freelance project, SwiftHire prioritizes skill and talent over
+              resumes. We leverage data-driven matching and skill-first
+              assessments to ensure the right fit for every opportunity.
             </p>
           </motion.div>
         </div>
