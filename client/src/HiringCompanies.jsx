@@ -4,28 +4,44 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Building2, Briefcase, Clock } from "lucide-react"; // ✅ Import icons
+import { toast, Bounce } from "react-toastify";
 
 const HiringCompanies = () => {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [appliedJobs, setAppliedJobs] = useState([]);
 
-  // ✅ Fetch companies when component loads
+
   useEffect(() => {
-    const fetchCompanies = async () => {
+    const fetchCompaniesAndAppliedJobs = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/companies");
-        setCompanies(response.data.data); // because backend sends { success, data: [...] }
+        document.title = "Find Jobs - SwiftHire";
+        const jobsRes = await axios.get("http://localhost:3000/recruiter/jobs");
+        setCompanies(jobsRes.data.data);
+
+        const token = localStorage.getItem("token");
+        const appliedRes = await axios.get(
+          "http://localhost:3000/user/applied-jobs",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const appliedJobIds = appliedRes.data.appliedJobs.map(
+          (job) => job.job_id
+        );
+        setAppliedJobs(appliedJobIds);
       } catch (error) {
-        console.error("Error fetching companies:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCompanies();
+    fetchCompaniesAndAppliedJobs();
   }, []);
 
-  // Framer Motion variants for cards
   const cardVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: (i) => ({
@@ -33,6 +49,31 @@ const HiringCompanies = () => {
       y: 0,
       transition: { delay: i * 0.1, duration: 0.6, ease: "easeOut" },
     }),
+  };
+
+  const handleApply = async (jobId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.post(
+        `http://localhost:3000/apply/${jobId}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      toast.success(res.data.message || "Application submitted!", {
+        position: "top-center",
+        autoClose: 2000,
+        transition: Bounce,
+      });
+
+      setAppliedJobs((prev) => [...prev, jobId]);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong", {
+        position: "top-center",
+        autoClose: 2000,
+        transition: Bounce,
+      });
+    }
   };
 
   return (
@@ -66,7 +107,7 @@ const HiringCompanies = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
         >
-          Companies Ready to Hire 🏢💼
+          Companies Ready to Hire
         </motion.h2>
 
         {loading ? (
@@ -80,46 +121,77 @@ const HiringCompanies = () => {
             <div className="flex gap-6 min-w-max">
               {companies.map((company, index) => (
                 <motion.div
-                  key={company.id}
-                  className="bg-gray-900 text-white rounded-3xl shadow-lg p-6 min-w-[280px] hover:scale-105 transition-transform duration-300 flex-shrink-0"
+                  key={company.job_id}
+                  className="bg-gray-900 text-white rounded-3xl shadow-lg p-8 min-w-[320px] hover:scale-105 transition-transform duration-300 flex-shrink-0 relative"
                   custom={index}
                   initial="hidden"
                   animate="visible"
                   variants={cardVariants}
                   whileHover={{ scale: 1.05 }}
                 >
-                  <h3 className="text-2xl font-bold mb-2">
+                  <h3 className="text-2xl md:text-3xl font-bold mb-3">
                     {company.company_name}
                   </h3>
-                  <p className="text-gray-300">
-                    <strong>Industry:</strong> {company.industry}
+                  <p className="text-gray-300 text-sm md:text-base flex items-center gap-2">
+                    <Building2 size={18} /> <strong>Industry:</strong>{" "}
+                    {company.industry}
                   </p>
-                  <p className="text-gray-300">
-                    <strong>City:</strong> {company.city}
+                  <p className="text-gray-300 text-sm md:text-base flex items-center gap-2">
+                    <Building2 size={18} /> <strong>City:</strong>{" "}
+                    {company.city}
                   </p>
-                  <p className="text-gray-300">
-                    <strong>Contact:</strong> {company.contact_email}
+                  <p className="text-gray-300 text-sm md:text-base flex items-center gap-2">
+                    <Briefcase size={18} /> <strong>Contact:</strong>{" "}
+                    {company.contact_email}
                   </p>
-                  <p className="text-gray-300">
-                    <strong>Phone:</strong> {company.phone_number}
+                  <p className="text-gray-300 text-sm md:text-base flex items-center gap-2">
+                    <Briefcase size={18} /> <strong>Phone:</strong>{" "}
+                    {company.phone_number}
                   </p>
-                  <p className="text-gray-300">
-                    <strong>Open Positions:</strong> {company.open_positions}
+                  <p className="text-gray-300 text-sm md:text-base flex items-center gap-2">
+                    <Briefcase size={18} /> <strong>Open Positions:</strong>{" "}
+                    {company.open_positions}
                   </p>
-                  <p className="text-gray-300">
-                    <strong>Hiring For:</strong> {company.hiring_for}
+                  <p className="text-gray-300 text-sm md:text-base flex items-center gap-2">
+                    <Briefcase size={18} /> <strong>Hiring For:</strong>{" "}
+                    {company.hiring_for}
                   </p>
-                  <p
-                    className={`mt-3 font-semibold ${
-                      company.immediate_hiring
-                        ? "text-green-500"
-                        : "text-yellow-400"
-                    }`}
-                  >
-                    {company.immediate_hiring
-                      ? "✅ Immediate Hiring"
-                      : "⏳ Hiring Soon"}
-                  </p>
+
+                  <div className="flex items-center justify-between mt-6 gap-4">
+                    <p
+                      className={`font-semibold flex items-center gap-2 ${
+                        company.immediate_hiring
+                          ? "text-green-500"
+                          : "text-yellow-400"
+                      }`}
+                    >
+                      {company.immediate_hiring ? (
+                        <>
+                          <Briefcase size={16} /> Immediate Hiring
+                        </>
+                      ) : (
+                        <>
+                          <Clock size={16} /> Hiring Soon
+                        </>
+                      )}
+                    </p>
+
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleApply(company.job_id)}
+                      disabled={appliedJobs.includes(company.job_id)}
+                      className={`font-semibold px-5 py-3 rounded-full text-sm shadow-md ${
+                        appliedJobs.includes(company.job_id)
+                          ? "bg-gray-600 text-white cursor-not-allowed"
+                          : "bg-green-600 text-white cursor-pointer"
+                      }`}
+                    >
+                      {appliedJobs.includes(company.job_id)
+                        ? "Applied"
+                        : "Apply Now"}
+                    </motion.button>
+                  </div>
                 </motion.div>
               ))}
             </div>
