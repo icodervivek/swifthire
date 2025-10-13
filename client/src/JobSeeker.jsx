@@ -38,7 +38,7 @@ const JobSeeker = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <div className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12 tracking-wider">
+      <div className="mt-5 flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12 tracking-wider">
         {/* Top Info Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
