@@ -1,5 +1,5 @@
 import express from "express";
-import pool from "../db.js";
+import { supabase } from "../supabaseClient.js"; // Supabase client
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import cors from "cors";
@@ -9,15 +9,16 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // replace with your React dev URL
-    credentials: true, // if you want cookies/auth headers
+    origin: process.env.FRONTEND_ORIGIN, // React dev URL
+    credentials: true,
   })
 );
 
 // Middleware to verify token
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ message: "No token provided" });
+  if (!authHeader)
+    return res.status(401).json({ message: "No token provided" });
 
   const token = authHeader.split(" ")[1]; // Bearer <token>
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
@@ -27,7 +28,7 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-// POST route for recruiter signup
+// POST /signup
 router.post("/signup", async (req, res) => {
   const {
     recruiter_name,
@@ -41,56 +42,60 @@ router.post("/signup", async (req, res) => {
   } = req.body;
 
   try {
-    // 1️⃣ Check if email or mobile already exists
-    const existing = await pool.query(
-      `SELECT recruiter_email, recruiter_mobile FROM recruiters WHERE recruiter_email = $1 OR recruiter_mobile = $2`,
-      [recruiter_email, recruiter_mobile]
-    );
+    // 1️⃣ Check if email or mobile exists
+    const { data: existing, error: existError } = await supabase
+      .from("recruiters")
+      .select("recruiter_email, recruiter_mobile")
+      .or(
+        `recruiter_email.eq.${recruiter_email},recruiter_mobile.eq.${recruiter_mobile}`
+      );
 
-    if (existing.rows.length > 0) {
-      const existingEmail = existing.rows.find(
+    if (existError) throw existError;
+
+    if (existing.length > 0) {
+      const existingEmail = existing.find(
         (r) => r.recruiter_email === recruiter_email
       );
-      const existingMobile = existing.rows.find(
+      const existingMobile = existing.find(
         (r) => r.recruiter_mobile === recruiter_mobile
       );
 
-      if (existingEmail && existingMobile) {
+      if (existingEmail && existingMobile)
         return res
           .status(400)
           .json({ message: "Email and mobile number are already registered" });
-      } else if (existingEmail) {
+      else if (existingEmail)
         return res.status(400).json({ message: "Email is already registered" });
-      } else {
+      else
         return res
           .status(400)
           .json({ message: "Mobile number is already registered" });
-      }
     }
 
-    // 2️⃣ Hash the password before storing
+    // 2️⃣ Hash password
     const hashedPassword = await bcrypt.hash(recruiter_password, 10);
 
     // 3️⃣ Insert new recruiter
-    const newRecruiter = await pool.query(
-      `INSERT INTO recruiters
-        (recruiter_name, recruiter_email, recruiter_password, recruiter_designation, recruiter_mobile, organisation_name, organisation_city, organisation_type)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
-      [
+    const { data: newRecruiter, error: insertError } = await supabase
+      .from("recruiters")
+      .insert({
         recruiter_name,
         recruiter_email,
-        hashedPassword,
+        recruiter_password: hashedPassword,
         recruiter_designation,
         recruiter_mobile,
         organisation_name,
         organisation_city,
         organisation_type,
-      ]
-    );
+      })
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
 
     res.status(201).json({
       message: "Recruiter registered successfully",
-      recruiter: newRecruiter.rows[0],
+      recruiter: newRecruiter,
     });
   } catch (err) {
     console.error(err);
@@ -102,33 +107,28 @@ router.post("/signup", async (req, res) => {
 router.post("/signin", async (req, res) => {
   const { recruiter_email, recruiter_password } = req.body;
 
-  if (!recruiter_email || !recruiter_password) {
+  if (!recruiter_email || !recruiter_password)
     return res.status(400).json({ message: "Email and password are required" });
-  }
 
   try {
-    // 1️⃣ Check if recruiter exists
-    const recruiterResult = await pool.query(
-      "SELECT * FROM recruiters WHERE recruiter_email = $1",
-      [recruiter_email]
-    );
+    const { data: recruiters, error } = await supabase
+      .from("recruiters")
+      .select("*")
+      .eq("recruiter_email", recruiter_email);
 
-    if (recruiterResult.rows.length === 0) {
+    if (error) throw error;
+    if (!recruiters || recruiters.length === 0)
       return res.status(401).json({ message: "Invalid email or password" });
-    }
 
-    const recruiter = recruiterResult.rows[0];
+    const recruiter = recruiters[0];
 
-    // 2️⃣ Compare password
     const isMatch = await bcrypt.compare(
       recruiter_password,
       recruiter.recruiter_password
     );
-    if (!isMatch) {
+    if (!isMatch)
       return res.status(401).json({ message: "Invalid email or password" });
-    }
 
-    // 3️⃣ Optional: Generate JWT token
     const token = jwt.sign(
       {
         recruiter_id: recruiter.recruiter_id,
@@ -138,7 +138,6 @@ router.post("/signin", async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    // 4️⃣ Send response
     res.status(200).json({
       message: "Signin successful",
       recruiter: {
@@ -151,7 +150,7 @@ router.post("/signin", async (req, res) => {
         organisation_city: recruiter.organisation_city,
         organisation_type: recruiter.organisation_type,
       },
-      token, // optional
+      token,
     });
   } catch (err) {
     console.error(err);
@@ -159,28 +158,29 @@ router.post("/signin", async (req, res) => {
   }
 });
 
+// GET /company
 router.get("/company", verifyToken, async (req, res) => {
   try {
-    const recruiterId = req.recruiterId;
+    const { data: recruiter, error } = await supabase
+      .from("recruiters")
+      .select("organisation_name")
+      .eq("recruiter_id", req.recruiterId)
+      .single();
 
-    const result = await pool.query(
-      "SELECT organisation_name FROM recruiters WHERE recruiter_id = $1",
-      [recruiterId]
-    );
-
-    if (result.rows.length === 0) {
+    if (error) throw error;
+    if (!recruiter)
       return res.status(404).json({ message: "Recruiter not found" });
-    }
 
-    res.json({ company_name: result.rows[0].organisation_name });
+    res.json({ company_name: recruiter.organisation_name });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
 
+// POST /jobs
 router.post("/jobs", verifyToken, async (req, res) => {
-  const recruiter_id = req.recruiterId; // from verifyToken middleware
+  const recruiter_id = req.recruiterId;
   const {
     company_name,
     industry,
@@ -193,14 +193,9 @@ router.post("/jobs", verifyToken, async (req, res) => {
   } = req.body;
 
   try {
-    const result = await pool.query(
-      `INSERT INTO jobs (
-        recruiter_id, company_name, industry, city, contact_email,
-        phone_number, open_positions, hiring_for, immediate_hiring
-      )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-      RETURNING *`,
-      [
+    const { data: job, error } = await supabase
+      .from("jobs")
+      .insert({
         recruiter_id,
         company_name,
         industry,
@@ -209,81 +204,93 @@ router.post("/jobs", verifyToken, async (req, res) => {
         phone_number,
         open_positions,
         hiring_for,
-        immediate_hiring === "yes" ? true : false,
-      ]
-    );
+        immediate_hiring: immediate_hiring === "yes",
+      })
+      .select()
+      .single();
 
-    res.status(201).json({ success: true, job: result.rows[0] });
+    if (error) throw error;
+
+    res.status(201).json({ success: true, job });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Error posting job" });
   }
 });
 
-
+// GET /jobs
 router.get("/jobs", async (req, res) => {
   try {
-    const result = await pool.query(
-      `SELECT jobs.*, recruiters.organisation_name
-       FROM jobs
-       JOIN recruiters ON jobs.recruiter_id = recruiters.recruiter_id
-       ORDER BY jobs.created_at DESC`
-    );
+    const { data, error } = await supabase
+      .from("jobs")
+      .select(
+        `
+        *,
+        recruiters:recruiter_id (organisation_name)
+      `
+      )
+      .order("created_at", { ascending: false });
 
-    res.status(200).json({ success: true, data: result.rows });
+    if (error) throw error;
+    res.status(200).json({ success: true, data });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Error fetching jobs" });
   }
 });
 
-
+// GET /jobs-with-applicants
 router.get("/jobs-with-applicants", async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT j.*, COUNT(ja.job_id) AS total_applicants
-      FROM jobs j
-      LEFT JOIN job_applications ja ON j.job_id = ja.job_id
-      GROUP BY j.job_id
-      ORDER BY j.created_at DESC;
-    `);
+    const { data, error } = await supabase.from("jobs").select(`
+        *,
+        job_applications:job_id (user_id)
+      `);
 
-    res.json({ success: true, data: result.rows });
+    if (error) throw error;
+
+    const jobsWithCount = data.map((job) => ({
+      ...job,
+      total_applicants: job.job_applications?.length || 0,
+    }));
+
+    res.json({ success: true, data: jobsWithCount });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Error fetching jobs" });
   }
 });
 
-
+// GET /manage-candidates
 router.get("/manage-candidates", verifyToken, async (req, res) => {
-  const recruiterId = req.recruiterId; // from middleware
   try {
-    // Fetch jobs posted by recruiter
-    const jobsResult = await pool.query(
-      `SELECT j.job_id, j.hiring_for, j.company_name, j.open_positions,
-              COUNT(ja.user_id) AS applicants_count
-       FROM jobs j
-       LEFT JOIN job_applications ja ON j.job_id = ja.job_id
-       WHERE j.recruiter_id = $1
-       GROUP BY j.job_id
-       ORDER BY j.created_at DESC`,
-      [recruiterId]
-    );
+    const recruiterId = req.recruiterId;
 
-    const jobs = jobsResult.rows;
+    // Fetch jobs for recruiter
+    const { data: jobs, error: jobsError } = await supabase
+      .from("jobs")
+      .select("*")
+      .eq("recruiter_id", recruiterId)
+      .order("created_at", { ascending: false });
 
-    // Fetch users for each job including experience, previous_job_role, contact_number
+    if (jobsError) throw jobsError;
+
+    // Fetch applicants for each job
     for (let job of jobs) {
-      const usersResult = await pool.query(
-        `SELECT u.id, u.name, u.email, u.experience, u.previous_job_role, u.contact_number, ja.applied_at
-         FROM job_applications ja
-         JOIN users u ON ja.user_id = u.id
-         WHERE ja.job_id = $1
-         ORDER BY ja.applied_at DESC`,
-        [job.job_id]
-      );
-      job.applicants = usersResult.rows;
+      const { data: applicants, error: applicantsError } = await supabase
+        .from("job_applications")
+        .select(
+          `
+          user_id,
+          applied_at,
+          users:user_id (id, name, email, experience, previous_job_role, contact_number)
+        `
+        )
+        .eq("job_id", job.job_id)
+        .order("applied_at", { ascending: false });
+
+      if (applicantsError) throw applicantsError;
+      job.applicants = applicants.map((a) => a.users);
     }
 
     res.json({ success: true, jobs });
@@ -293,36 +300,41 @@ router.get("/manage-candidates", verifyToken, async (req, res) => {
   }
 });
 
-// GET /recruiter/job-analytics
+// GET /job-analytics
 router.get("/job-analytics", verifyToken, async (req, res) => {
-  const recruiterId = req.recruiterId; // from middleware
-
   try {
-    // Total jobs posted by recruiter
-    const jobRes = await pool.query(
-      "SELECT COUNT(*) AS total_jobs FROM jobs WHERE recruiter_id = $1",
-      [recruiterId]
-    );
+    const recruiterId = req.recruiterId;
 
-    // Total unique applicants applied for recruiter's jobs
-    const applicantRes = await pool.query(
-      `SELECT COUNT(DISTINCT ja.user_id) AS total_applicants
-       FROM job_applications ja
-       JOIN jobs j ON ja.job_id = j.job_id
-       WHERE j.recruiter_id = $1`,
-      [recruiterId]
-    );
+    const { count: totalJobs, error: jobsError } = await supabase
+      .from("jobs")
+      .select("*", { count: "exact", head: true })
+      .eq("recruiter_id", recruiterId);
+
+    if (jobsError) throw jobsError;
+
+    const { count: totalApplicants, error: applicantsError } = await supabase
+      .from("job_applications")
+      .select("*", { count: "exact", head: true })
+      .in(
+        "job_id",
+        (
+          await supabase
+            .from("jobs")
+            .select("job_id")
+            .eq("recruiter_id", recruiterId)
+        ).data.map((j) => j.job_id)
+      );
+
+    if (applicantsError) throw applicantsError;
 
     res.json({
-      totalJobs: Number(jobRes.rows[0].total_jobs),
-      totalApplicants: Number(applicantRes.rows[0].total_applicants),
+      totalJobs: totalJobs || 0,
+      totalApplicants: totalApplicants || 0,
     });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
-
-
 
 export default router;
