@@ -4,178 +4,161 @@ import pdf from "pdf-parse-new";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { LLMChain } from "langchain/chains";
 import { PromptTemplate } from "@langchain/core/prompts";
-import pool from "../db.js";
+import pool from "../db.js"; // your DB connection file
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Gemini AI setup
+// ✅ Gemini 2.0 setup
 const model = new ChatGoogleGenerativeAI({
   model: "gemini-2.0-flash",
   temperature: 0.3,
   apiKey: process.env.GOOGLE_API_KEY,
 });
 
-// Prompt to extract technical skills from resume
-const skillsPrompt = new PromptTemplate({
+// ✅ Prompt 1: Extract Skills
+const extractSkillsPrompt = new PromptTemplate({
   template: `
-You are a highly precise career assistant.
+You are an expert resume analyzer. From the text below, extract the most relevant **skills and technologies**.
+Return ONLY a valid JSON array of strings. No explanation, no markdown.
 
-From the following resume text, extract **all relevant skills and proficiencies** of the candidate. 
-This includes:
-- **Technical skills**: programming languages, frameworks, libraries, tools, software, cloud technologies, DevOps skills, AI/ML skills.
-- **Non-technical skills**: HR, recruitment, sales, marketing, content creation, communication, project management, customer support, leadership, or business skills.
-
-Do NOT extract job titles, roles, company names, degrees, certifications, or personal details.
-
-Return the output as a **comma-separated list of lowercase keywords**, without any extra text.
-Each skill should be short and clean (e.g., "react, node.js, python, sql, recruitment, customer support, content writing").
-
-If a skill is mentioned multiple times, include it only once.
+Example:
+["React", "Node.js", "PostgreSQL", "Python"]
 
 Resume Text:
 {text}
-  `,
+`,
   inputVariables: ["text"],
 });
 
+// ✅ Prompt 2: Job Matching
+const jobMatchPrompt = new PromptTemplate({
+  template: `
+You are an intelligent hiring assistant.
+Given:
+- Candidate skills: {skills}
+- Available jobs: {jobs}
 
-const skillsChain = new LLMChain({ llm: model, prompt: skillsPrompt });
+Match the candidate to the most relevant jobs.
 
-// Map technical skills to corresponding job roles
-const skillRoleMap = {
-  react: [
-    "Front-end Web Developer",
-    "React.js Developer",
-    "Full Stack Web Developer",
-  ],
-  "react.js": [
-    "Front-end Web Developer",
-    "React.js Developer",
-    "Full Stack Web Developer",
-  ],
-  "node.js": [
-    "Backend Web Developer",
-    "Full Stack Developer",
-    "Full Stack Web Developer",
-  ],
-  javascript: [
-    "Front-end Web Developer",
-    "React.js Developer",
-    "Full Stack Web Developer",
-  ],
-  python: [
-    "Python Full Stack Developer",
-    "Data Scientist",
-    "AI Research Scientist",
-  ],
-  java: ["Java Full Stack Developer", "Spring Boot Developer"],
-  sql: ["Data Analyst", "Backend Web Developer", "Full Stack Developer"],
-  docker: ["DevOps Engineer", "Backend Web Developer"],
-  aws: ["DevOps Engineer", "Backend Web Developer", "AI Research Scientist"],
-  "spring boot": ["Spring Boot Developer", "Java Full Stack Developer"],
-  django: ["Python Full Stack Developer", "Backend Web Developer"],
-  flask: ["Python Full Stack Developer", "Backend Web Developer"],
-  "c++": ["Embedded Systems Engineer", "Python Full Stack Developer"],
-  "machine learning": ["Data Scientist", "AI Research Scientist"],
-  "react native": ["Mobile Developer", "Full Stack Developer"],
-  html: ["Front-end Web Developer", "Full Stack Web Developer"],
-  css: ["Front-end Web Developer", "Full Stack Web Developer"],
-  typescript: ["Front-end Web Developer", "Full Stack Web Developer"],
-  kubernetes: ["DevOps Engineer", "Backend Web Developer"],
-  // Add more skills as needed
-  hr: ["HR", "HR Manager", "HR Executive"],
-  "human resources": ["HR", "HR Manager", "HR Executive"],
-  recruitment: ["HR", "HR Manager", "HR Executive"],
-  "customer support": [
-    "Customer Support",
-    "Client Support Executive",
-    "Helpdesk Executive",
-  ],
-  "customer service": [
-    "Customer Support",
-    "Client Support Executive",
-    "Helpdesk Executive",
-  ],
-  sales: [
-    "Sales Executive",
-    "Account Executive",
-    "Business Development Executive",
-  ],
-  marketing: ["Marketing Executive", "Content Strategist", "Brand Manager"],
-  "content writing": ["Content Strategist", "Copywriter", "Content Manager"],
-  copywriting: ["Content Strategist", "Copywriter", "Content Manager"],
-  "social media": [
-    "Social Media Manager",
-    "Content Strategist",
-    "Marketing Executive",
-  ],
-  "project management": [
-    "Project Manager",
-    "Production Manager",
-    "Program Manager",
-  ],
-  ai: ["GenAI Developer", "AI Research Scientist", "Data Scientist"],
-  genai: ["GenAI Developer", "AI Research Scientist"],
-};
+Return a **pure JSON array** in this format (no markdown, no text):
+[
+  {{
+    "job_id": <job_id>,
+    "job_title": "<job_title>",
+    "match_reason": "<why this fits>",
+    "confidence": <1-10>
+  }}
+]
+`,
+  inputVariables: ["skills", "jobs"],
+});
 
-// --------------------------
-// Upload PDF & match jobs
-// --------------------------
+// ✅ LangChain Chains
+const extractSkillsChain = new LLMChain({
+  llm: model,
+  prompt: extractSkillsPrompt,
+});
+const jobMatchChain = new LLMChain({ llm: model, prompt: jobMatchPrompt });
+
+// ✅ Upload Resume Route
 router.post("/upload", upload.single("pdf"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded." });
     }
 
-    // Step 1: Extract PDF text
+    // Step 1: Extract PDF Text
     const data = await pdf(req.file.buffer);
     const pdfText = data.text;
 
-    // Step 2: Extract skills from resume
-    const skillResponse = await skillsChain.call({ text: pdfText });
-    const extractedSkills = skillResponse.text
-      .replace(/\n/g, "")
-      .split(",")
-      .map((s) => s.trim().toLowerCase())
+    // Step 2: Extract Skills
+    const skillRes = await extractSkillsChain.call({ text: pdfText });
+    let extractedSkills = [];
+
+    try {
+      extractedSkills = JSON.parse(skillRes.text.trim());
+    } catch {
+      extractedSkills = skillRes.text
+        .split(/,|\n|;/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
+
+    // Step 3: Fetch Jobs from DB
+    const { rows: jobs } = await pool.query(
+      `SELECT job_id, hiring_for, company_name, city, industry FROM jobs`
+    );
+
+    // Step 4: Match Jobs using LLM
+    const jobsData = JSON.stringify(
+      jobs.map((job) => ({
+        job_id: job.job_id,
+        job_title: job.hiring_for,
+        company: job.company_name,
+        city: job.city,
+        industry: job.industry,
+      }))
+    );
+
+    const matchRes = await jobMatchChain.call({
+      skills: extractedSkills.join(", "),
+      jobs: jobsData,
+    });
+
+    // Step 5: Parse Matches
+    // Step 5: Parse Matches (robust)
+    let matches = [];
+    try {
+      // Clean unwanted markdown or code fences
+      const cleanedText = matchRes.text
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .replace(/^.*?\[/s, "[") // start from first [
+        .replace(/]([^]*?)$/s, "]") // end at last ]
+        .trim();
+
+      matches = JSON.parse(cleanedText);
+
+      if (!Array.isArray(matches)) {
+        throw new Error("AI response is not a JSON array");
+      }
+    } catch (err) {
+      console.warn("AI match JSON parse failed:", err);
+      matches = [
+        {
+          job_id: null,
+          job_title: "Parsing Failed",
+          match_reason: matchRes.text.trim().slice(0, 200),
+          confidence: 0,
+        },
+      ];
+    }
+
+    // Step 6: Enrich matches with company details
+    const matchedJobs = matches
+      .map((match) => {
+        const job = jobs.find((j) => j.job_id === match.job_id);
+        return job
+          ? {
+              ...job,
+              match_reason: match.match_reason,
+              confidence: match.confidence,
+            }
+          : null;
+      })
       .filter(Boolean);
 
-    console.log("Extracted Skills:", extractedSkills);
-
-    // Step 3: Fetch jobs from DB
-    const { rows: jobs } = await pool.query(`
-      SELECT id, company_name, industry, city, contact_email, phone_number, open_positions, hiring_for, immediate_hiring
-      FROM companies;
-    `);
-
-    // Step 4: Match jobs based on skill-role map
-    const matchedJobs = jobs
-      .map((job) => {
-        const jobTitle = job.hiring_for ? job.hiring_for.trim() : "";
-        let matchCount = 0;
-
-        extractedSkills.forEach((skill) => {
-          const mappedRoles = skillRoleMap[skill] || [];
-          if (mappedRoles.includes(jobTitle)) {
-            matchCount++;
-          }
-        });
-
-        return { ...job, matchCount };
-      })
-      .filter((job) => job.matchCount > 0)
-      .sort((a, b) => b.matchCount - a.matchCount);
-
-    return res.json({
+    res.json({
       message: matchedJobs.length
         ? "Job recommendations found."
-        : "No matching jobs.",
-      skills: extractedSkills,
+        : "No strong matches found.",
+      extractedSkills,
       matchedJobs,
     });
   } catch (err) {
     console.error("Resume processing error:", err);
-    res.status(500).json({ error: "Failed to process uploaded PDF." });
+    res.status(500).json({ error: "Failed to process uploaded resume." });
   }
 });
 
