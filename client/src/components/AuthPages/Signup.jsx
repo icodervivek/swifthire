@@ -61,7 +61,7 @@ const Signup = () => {
       <Navbar />
       <ToastContainer />
 
-      <div className="signup-section flex flex-col md:flex-row items-center justify-center px-4 sm:px-6 lg:px-12 py-12 min-h-screen">
+      <div className="signup-section flex flex-col md:flex-row items-center justify-center px-4 sm:px-6 lg:px-12 py-12 min-h-screen mt-10">
         <div className="w-full max-w-7xl flex flex-col md:flex-row items-center justify-center gap-10">
           {/* Left Section: Form */}
           <div className="form-section w-full md:w-1/2 max-w-md p-8 rounded-lg shadow-md">

@@ -72,7 +72,7 @@ useEffect(() => {
       <ToastContainer />
 
       <motion.div
-        className="flex flex-col items-center justify-center px-4 sm:px-6 lg:px-12 py-12 flex-grow"
+        className="flex flex-col mt-15 items-center justify-center px-4 sm:px-6 lg:px-12 py-12 flex-grow"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}

@@ -15,8 +15,7 @@ const Signin = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/signin`
-        ,
+        `${import.meta.env.VITE_API_URL}/signin`,
         { email, password },
         { withCredentials: true }
       );
@@ -37,15 +36,15 @@ const Signin = () => {
   };
 
   useEffect(() => {
-        document.title = "Sign In - SwiftHire";
-      }, []);
+    document.title = "Sign In - SwiftHire";
+  }, []);
 
   return (
     <>
       <Navbar />
       <ToastContainer />
 
-      <div className="signup-section flex flex-col md:flex-row items-center justify-center px-4 sm:px-6 lg:px-12 py-12 min-h-screen">
+      <div className="signup-section flex flex-col md:flex-row items-center mt-10 justify-center px-4 sm:px-6 lg:px-12 py-12 min-h-screen">
         <div className="w-full max-w-7xl flex flex-col md:flex-row items-center justify-center gap-10">
           {/* Left Section: Form */}
           <div className="form-section w-full md:w-1/2 max-w-md p-8 rounded-lg shadow-md">
@@ -74,11 +73,24 @@ const Signin = () => {
                 Sign In
               </button>
             </form>
+            <p className="text-center text-gray-400 mt-4">
+              Don't have an account?{" "}
+              <span
+                onClick={() => navigate("/signup")}
+                className="text-purple-500 font-semibold cursor-pointer hover:underline transition-colors"
+              >
+                Sign Up Now
+              </span>
+            </p>
           </div>
 
           {/* Right Section: Image */}
           <div className="description-section w-full md:w-1/2 flex justify-center">
-            <img src="/signin.svg" alt="Sign In" className="w-64 sm:w-80 md:w-96 lg:w-[28rem]" />
+            <img
+              src="/signin.svg"
+              alt="Sign In"
+              className="w-64 sm:w-80 md:w-96 lg:w-[28rem]"
+            />
           </div>
         </div>
       </div>

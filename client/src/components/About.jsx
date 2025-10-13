@@ -14,7 +14,7 @@ const About = () => {
       <Navbar />
 
       {/* Main content */}
-      <section className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-12">
+      <section className="flex-grow mt-15 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-12">
         <div className="max-w-7xl w-full flex flex-col md:flex-row items-center justify-center gap-12">
           {/* Left: Image */}
           <motion.div
