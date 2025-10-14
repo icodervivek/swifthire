@@ -1,18 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { useEffect } from "react";
 
 const Contact = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false); // ✅ Loading state
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // ✅ Start spinner
 
     try {
       const response = await axios.post(
@@ -36,6 +37,8 @@ const Contact = () => {
         autoClose: 2000,
         transition: Bounce,
       });
+    } finally {
+      setLoading(false); // ✅ Stop spinner
     }
   };
 
@@ -89,9 +92,36 @@ const Contact = () => {
               />
               <button
                 type="submit"
-                className="bg-gradient-to-r from-[#2a7b9b] via-[#57c785] to-[#eddd53] text-white px-6 py-3 rounded-full font-semibold hover:scale-105 transition-transform cursor-pointer"
+                className="bg-gradient-to-r from-[#2a7b9b] to-[#4e9ccf] text-white px-6 py-3 rounded-full font-semibold hover:scale-105 transition-transform cursor-pointer flex justify-center items-center gap-2"
+                disabled={loading} // ✅ Disable button while sending
               >
-                Send Message
+                {loading ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      ></path>
+                    </svg>
+                    Sending...
+                  </>
+                ) : (
+                  "Send Message"
+                )}
               </button>
               <ToastContainer />
             </form>

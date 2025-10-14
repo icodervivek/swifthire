@@ -6,14 +6,23 @@ import { Bounce, ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
+
 const Profile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    experience: "",
+    previous_job_role: "",
+    contact_number: "",
+  });
+
   useEffect(() => {
     document.title = "Profile - SwiftHire";
   }, []);
+
   useEffect(() => {
     const fetchProfileAndAppliedJobs = async () => {
       try {
@@ -32,7 +41,6 @@ const Profile = () => {
           `${import.meta.env.VITE_API_URL}/profile`,
           {
             headers: { Authorization: `Bearer ${token}` },
-            withCredentials: true,
           }
         );
         setUser(profileRes.data.user);
@@ -66,7 +74,47 @@ const Profile = () => {
       autoClose: 1500,
       transition: Bounce,
     });
-    setTimeout(() => navigate("/signin"), 1500);
+    setTimeout(() => navigate("/"), 1500);
+  };
+
+  const handleEditClick = () => {
+    setFormData({
+      experience: user.experience || "",
+      previous_job_role: user.previous_job_role || "",
+      contact_number: user.contact_number || "",
+    });
+    setIsEditing(true);
+  };
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSave = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.put(
+        `${import.meta.env.VITE_API_URL}/user/update-profile`,
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setUser(res.data.user);
+      toast.success("Profile updated successfully!", {
+        position: "top-center",
+        autoClose: 2000,
+        transition: Bounce,
+      });
+      setIsEditing(false);
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to update profile", {
+        position: "top-center",
+        autoClose: 2000,
+        transition: Bounce,
+      });
+    }
   };
 
   return (
@@ -105,24 +153,84 @@ const Profile = () => {
               <p className="text-lg text-gray-300 mb-2">
                 <strong>Email:</strong> {user.email}
               </p>
-              <p className="text-lg text-gray-300 mb-2">
+              {/* <p className="text-lg text-gray-300 mb-2">
                 <strong>User ID:</strong> {user.id}
-              </p>
-              {/* New Fields */}
-              <p className="text-lg text-gray-300 mb-2">
-                <strong>Experience:</strong> {user.experience ?? 0} months
-              </p>
-              <p className="text-lg text-gray-300 mb-2">
-                <strong>Previous Job Role:</strong>{" "}
-                {user.previous_job_role || "N/A"}
-              </p>
-              <p className="text-lg text-gray-300 mb-2">
-                <strong>Contact Number:</strong> {user.contact_number || "N/A"}
-              </p>
+              </p> */}
+
+              {isEditing ? (
+                <>
+                  <input
+                    type="text"
+                    name="experience"
+                    placeholder="Experience (in months)"
+                    value={formData.experience}
+                    onChange={handleChange}
+                    className="w-full mb-3 px-4 py-2 rounded-lg border-1"
+                  />
+                  <input
+                    type="text"
+                    name="previous_job_role"
+                    placeholder="Previous Job Role"
+                    value={formData.previous_job_role}
+                    onChange={handleChange}
+                    className="w-full mb-3 px-4 py-2 rounded-lg border-1"
+                  />
+                  <input
+                    type="text"
+                    name="contact_number"
+                    placeholder="Contact Number"
+                    value={formData.contact_number}
+                    onChange={handleChange}
+                    className="w-full mb-3 px-4 py-2 rounded-lg border-1"
+                  />
+
+                  <div className="flex justify-center gap-4 mt-2">
+                    <motion.button
+                      onClick={handleSave}
+                      className="bg-green-500 cursor-pointer hover:bg-green-600 py-2 px-6 rounded-full font-semibold shadow-lg"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Save
+                    </motion.button>
+                    <motion.button
+                      onClick={() => setIsEditing(false)}
+                      className="bg-gray-500 cursor-pointer hover:bg-gray-600 py-2 px-6 rounded-full font-semibold shadow-lg"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Cancel
+                    </motion.button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-lg text-gray-300 mb-2">
+                    <strong>Experience:</strong> {user.experience ?? 0} months
+                  </p>
+                  <p className="text-lg text-gray-300 mb-2">
+                    <strong>Previous Job Role:</strong>{" "}
+                    {user.previous_job_role || "N/A"}
+                  </p>
+                  <p className="text-lg text-gray-300 mb-2">
+                    <strong>Contact Number:</strong>{" "}
+                    {user.contact_number || "N/A"}
+                  </p>
+
+                  <motion.button
+                    onClick={handleEditClick}
+                    className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white py-2 px-6 rounded-full font-semibold shadow-lg mt-4"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Edit Profile
+                  </motion.button>
+                </>
+              )}
 
               <motion.button
                 onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-600 cursor-pointer text-white py-3 px-8 rounded-full font-semibold shadow-lg mt-4"
+                className="bg-red-500 hover:bg-red-600 cursor-pointer text-white mx-2 py-2 px-6 rounded-full font-semibold shadow-lg mt-4"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -130,7 +238,6 @@ const Profile = () => {
               </motion.button>
             </motion.div>
 
-            {/* ===== Jobs Applied Section ===== */}
             {/* ===== Jobs Applied Section ===== */}
             <motion.div
               className="w-full max-w-4xl bg-[#111111]/70 backdrop-blur-md shadow-lg rounded-3xl p-8"

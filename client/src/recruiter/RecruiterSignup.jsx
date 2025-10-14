@@ -20,6 +20,8 @@ const RecruiterSignup = () => {
     organisation_city: "",
     organisation_type: "",
   });
+  const [loading, setLoading] = useState(false);
+
 
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate(); // ✅ Initialize navigation
@@ -28,42 +30,43 @@ const RecruiterSignup = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true); // ✅ Start spinner
 
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/recruiter/signup`,
-        formData
-      );
+  try {
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_URL}/recruiter/signup`,
+      formData
+    );
 
-      toast.success(res.data.message); // ✅ Show success toast
+    toast.success(res.data.message);
 
-      // Reset form
-      setFormData({
-        recruiter_name: "",
-        recruiter_email: "",
-        recruiter_password: "",
-        recruiter_designation: "",
-        recruiter_mobile: "",
-        organisation_name: "",
-        organisation_city: "",
-        organisation_type: "",
-      });
+    setFormData({
+      recruiter_name: "",
+      recruiter_email: "",
+      recruiter_password: "",
+      recruiter_designation: "",
+      recruiter_mobile: "",
+      organisation_name: "",
+      organisation_city: "",
+      organisation_type: "",
+    });
 
-      // Navigate to signin after a short delay
-      setTimeout(() => {
-        navigate("/recruiter/signin");
-      }, 2000); // 2 seconds delay
-    } catch (err) {
-      if (err.response && err.response.data) {
-        toast.error(err.response.data.message); // ✅ Show error toast
-      } else {
-        toast.error("Something went wrong. Please try again.");
-      }
-      console.error(err);
+    setTimeout(() => {
+      navigate("/recruiter/signin");
+    }, 2000);
+  } catch (err) {
+    if (err.response && err.response.data) {
+      toast.error(err.response.data.message);
+    } else {
+      toast.error("Something went wrong. Please try again.");
     }
-  };
+    console.error(err);
+  } finally {
+    setLoading(false); // ✅ Stop spinner
+  }
+};
 
   const inputClass =
     "w-full h-11 text-base border border-gray-300 rounded-lg px-4 focus:ring-2 focus:ring-[#1E4633] outline-none";
@@ -266,14 +269,41 @@ const RecruiterSignup = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <motion.button
-                type="submit"
-                className="bg-white text-black cursor-pointer rounded-full px-8 py-3 font-semibold hover:bg-gray-200 transition"
-                whileHover={{ backgroundColor: "#e5e5e5" }}
-                style={{ outline: "none" }}
-              >
-                Register & Continue
-              </motion.button>
+             <motion.button
+  type="submit"
+  className="bg-white text-black cursor-pointer rounded-full px-8 py-3 font-semibold hover:bg-gray-200 transition"
+  whileHover={{ backgroundColor: "#e5e5e5" }}
+  disabled={loading} // ✅ Disable while loading
+>
+  {loading ? (
+    <div className="flex items-center justify-center gap-2">
+      <svg
+        className="animate-spin h-5 w-5 text-black"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        ></circle>
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+        ></path>
+      </svg>
+      Registering...
+    </div>
+  ) : (
+    "Register & Continue"
+  )}
+</motion.button>
+
             </motion.div>
           </motion.form>
         </motion.div>

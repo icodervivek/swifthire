@@ -1,41 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../Navbar";
 import Footer from "../Footer";
 import axios from "axios";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import cors from "cors";
-import { useEffect } from "react";
 
 const Signup = () => {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const [experience, setExperience] = useState("");
-  // const [previousJob, setPreviousJob] = useState("");
-  // const [contactNumber, setContactNumber] = useState("");
-
+  const [loading, setLoading] = useState(false); // ✅ Loading state
 
   useEffect(() => {
-        document.title = "Sign Up - SwiftHire";
-      }, []);
-
+    document.title = "Sign Up - SwiftHire";
+  }, []);
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setLoading(true); // ✅ Start spinner
 
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/signup`,
-        {
-          name,
-          email,
-          password,
-          // experience,
-          // previous_job_role: previousJob,
-          // contact_number: contactNumber,
-        },
+        { name, email, password },
         { withCredentials: true }
       );
 
@@ -44,15 +32,16 @@ const Signup = () => {
         autoClose: 2000,
         transition: Bounce,
       });
-      setTimeout(() => {
-        navigate("/signin");
-      }, 2000);
+
+      setTimeout(() => navigate("/signin"), 2000);
     } catch (error) {
-      toast.error(error.response?.data?.message, {
+      toast.error(error.response?.data?.message || "Signup Failed", {
         position: "top-center",
         autoClose: 2000,
         transition: Bounce,
       });
+    } finally {
+      setLoading(false); // ✅ Stop spinner
     }
   };
 
@@ -84,7 +73,6 @@ const Signup = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-
               />
               <input
                 type="password"
@@ -94,41 +82,41 @@ const Signup = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-
               />
-              {/* <input
-                type="number"
-                name="experience"
-                placeholder="Experience (months)"
-                className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={experience}
-                onChange={(e) => setExperience(e.target.value)}
-              />
-              <input
-                type="text"
-                name="previousJob"
-                placeholder="Previous Job Role"
-                className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={previousJob}
-                onChange={(e) => setPreviousJob(e.target.value)}
-                
-              />
-              <input
-                type="text"
-                name="contactNumber"
-                placeholder="Contact Number"
-                className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={contactNumber}
-                onChange={(e) => setContactNumber(e.target.value)}
-                required
 
-              /> */}
-
+              {/* Submit Button */}
               <button
                 type="submit"
-                className="bg-green-500 hover:bg-green-600 cursor-pointer transition tracking-widest text-white py-3 rounded text-lg"
+                className="bg-green-500 hover:bg-green-600 cursor-pointer transition tracking-widest text-white py-3 rounded text-lg flex justify-center items-center gap-2"
+                disabled={loading} // ✅ Disable button while loading
               >
-                Register
+                {loading ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      ></path>
+                    </svg>
+                    Registering...
+                  </>
+                ) : (
+                  "Register"
+                )}
               </button>
             </form>
           </div>

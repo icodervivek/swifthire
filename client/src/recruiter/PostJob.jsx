@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 const PostJob = () => {
   const [companyName, setCompanyName] = useState("");
 
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     company_name: "",
     industry: "",
@@ -27,13 +29,16 @@ const PostJob = () => {
   useEffect(() => {
     const fetchCompanyName = async () => {
       try {
-        document.title = "Post Job"
+        document.title = "Post Job";
         const token = localStorage.getItem("recruiterToken");
         if (!token) return console.error("No token in localStorage");
 
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/recruiter/company`, {
-          headers: { Authorization: `Bearer ${token}` }, // ✅ correct format
-        });
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/recruiter/company`,
+          {
+            headers: { Authorization: `Bearer ${token}` }, // ✅ correct format
+          }
+        );
         setCompanyName(res.data.company_name);
         setFormData((prev) => ({
           ...prev,
@@ -56,19 +61,25 @@ const PostJob = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // ✅ Start spinner
 
     try {
       const token = localStorage.getItem("recruiterToken");
 
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/recruiter/jobs`, formData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/recruiter/jobs`,
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-      toast.success(res.data.message, {
+      toast.success("Job Posting Successful!", {
         position: "top-right",
         autoClose: 2000,
       });
 
+      // Reset form (except company_name)
       setFormData((prev) => ({
         ...prev,
         industry: "",
@@ -96,6 +107,8 @@ const PostJob = () => {
         });
       }
       console.error(err);
+    } finally {
+      setLoading(false); // ✅ Stop spinner
     }
   };
 
@@ -259,8 +272,35 @@ const PostJob = () => {
                 type="submit"
                 className="bg-white text-black cursor-pointer rounded-full px-8 py-3 font-semibold hover:bg-gray-200 transition"
                 whileHover={{ backgroundColor: "#e5e5e5" }}
+                disabled={loading} // ✅ Disable button while loading
               >
-                Post Job
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <svg
+                      className="animate-spin h-5 w-5 text-black"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      ></path>
+                    </svg>
+                    Posting...
+                  </div>
+                ) : (
+                  "Post Job"
+                )}
               </motion.button>
             </motion.div>
           </motion.form>
