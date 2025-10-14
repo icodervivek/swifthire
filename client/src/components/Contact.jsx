@@ -3,7 +3,6 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import axios from "axios";
-import ContactSvg from "../../public/contact.svg";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 
@@ -107,7 +106,7 @@ const Contact = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <img
-              src={ContactSvg}
+              src="contact.svg"
               alt="Contact Us"
               className="w-50 sm:w-80 md:mt-30 max-w-sm md:max-w-md"
             />

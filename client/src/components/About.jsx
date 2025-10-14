@@ -1,7 +1,6 @@
 import React from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import AboutSvg from "../../public/about.svg";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 
@@ -25,7 +24,7 @@ const About = () => {
             transition={{ duration: 0.8 }}
           >
             <img
-              src={AboutSvg}
+              src="about.svg"
               alt="About Us"
               className="w-64 sm:w-80 md:w-full max-w-sm md:max-w-md"
             />
