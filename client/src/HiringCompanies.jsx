@@ -259,7 +259,12 @@ const HiringCompanies = () => {
                         if (token) {
                           handleApplyClick(company.job_id);
                         } else {
-                          navigate("/signin");
+                          toast.info("To apply for job, please login first!", {
+                            position: "top-center",
+                            autoClose: 2000,
+                            transition: Bounce,
+                          });
+                          setTimeout(() => navigate("/signin"), 2000); // delay navigation so toast shows
                         }
                       }}
                       disabled={appliedJobs.includes(company.job_id)}
