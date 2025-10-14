@@ -8,6 +8,7 @@ import { Building2, Briefcase, Clock } from "lucide-react"; // ✅ Import icons
 import { toast, Bounce } from "react-toastify";
 import Search from "./components/Search";
 import { useLocation } from "react-router-dom";
+import ProfileModal from "./components/ProfileModal";
 
 const HiringCompanies = () => {
   const [companies, setCompanies] = useState([]);
@@ -16,6 +17,9 @@ const HiringCompanies = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const queryFromUrl = searchParams.get("search") || "";
+  const [user, setUser] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [pendingJobId, setPendingJobId] = useState(null);
 
   const [searchQuery, setSearchQuery] = useState(queryFromUrl);
 
@@ -52,31 +56,28 @@ const HiringCompanies = () => {
     fetchCompaniesAndAppliedJobs();
   }, []);
 
- useEffect(() => {
-  const fetchCompanies = async () => {
-    try {
-      setLoading(true);
-      const url = `${import.meta.env.VITE_API_URL}/recruiter/jobs`;
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        setLoading(true);
+        const url = `${import.meta.env.VITE_API_URL}/recruiter/jobs`;
 
-      // Always call API — if searchQuery is empty, show all jobs
-      const res = await axios.get(url, {
-        params: searchQuery ? { search: searchQuery } : {},
-      });
+        // Always call API — if searchQuery is empty, show all jobs
+        const res = await axios.get(url, {
+          params: searchQuery ? { search: searchQuery } : {},
+        });
 
-      setCompanies(res.data.data || []);
-    } catch (err) {
-      console.error("Error fetching companies:", err);
-      setCompanies([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+        setCompanies(res.data.data || []);
+      } catch (err) {
+        console.error("Error fetching companies:", err);
+        setCompanies([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  fetchCompanies();
-}, [searchQuery]);
-
-
-
+    fetchCompanies();
+  }, [searchQuery]);
 
   const cardVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -112,6 +113,40 @@ const HiringCompanies = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(res.data.user);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const handleApplyClick = (jobId) => {
+    // check if profile is incomplete
+    if (!user.experience || !user.previous_job_role || !user.contact_number) {
+      setPendingJobId(jobId);
+      setShowModal(true);
+      return;
+    }
+
+    // profile complete, apply directly
+    handleApply(jobId);
+  };
+
+  // After profile update
+  const handleProfileUpdated = (updatedUser) => {
+    setUser(updatedUser);
+    if (pendingJobId) handleApply(pendingJobId);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -138,115 +173,121 @@ const HiringCompanies = () => {
         </motion.div>
       </div>
 
-     <div className="flex-grow container px-4 sm:px-6 lg:px-8 tracking-wider mx-auto">
-  <Search
-    initialQuery={searchQuery}
-    onSearch={(q) => setSearchQuery(q)}
-  />
+      <div className="flex-grow container px-4 sm:px-6 lg:px-8 tracking-wider mx-auto">
+        <Search
+          initialQuery={searchQuery}
+          onSearch={(q) => setSearchQuery(q)}
+        />
 
-  <motion.h2
-    className="text-4xl font-extrabold text-center mt-10 mb-10"
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: 0.2, duration: 0.6 }}
-  >
-    Companies Ready to Hire
-  </motion.h2>
+        <motion.h2
+          className="text-4xl font-extrabold text-center mt-10 mb-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+        >
+          Companies Ready to Hire
+        </motion.h2>
 
-  {loading ? (
-    <div className="text-center text-gray-600 text-lg">Loading...</div>
-  ) : companies.length === 0 ? (
-    <div className="text-center text-gray-600 text-lg">
-      No hiring companies found.
-    </div>
-  ) : (
-    <div className="py-6 flex justify-center">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
-        {companies.map((company, index) => (
-          <motion.div
-            key={company.job_id}
-            className="bg-gray-900 text-white rounded-3xl shadow-lg p-8 flex flex-col justify-between hover:scale-105 transition-transform duration-300"
-            custom={index}
-            initial="hidden"
-            animate="visible"
-            variants={cardVariants}
-            whileHover={{ scale: 1.05 }}
-            style={{ minHeight: "380px" }} // consistent height
-          >
-            <div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-3 text-white">
-                {company.company_name}
-              </h3>
-              <p className="text-gray-300 text-sm md:text-base flex items-center gap-2 mb-1">
-                <Building2 size={18} /> {company.industry}
-              </p>
-              <p className="text-gray-300 text-sm md:text-base flex items-center gap-2 mb-1">
-                <Building2 size={18} /> {company.city}
-              </p>
-              <p className="text-gray-300 text-sm md:text-base flex items-center gap-2 mb-1">
-                <Briefcase size={18} /> {company.contact_email}
-              </p>
-              <p className="text-gray-300 text-sm md:text-base flex items-center gap-2 mb-1">
-                <Briefcase size={18} /> {company.phone_number}
-              </p>
-              <p className="text-gray-300 text-sm md:text-base flex items-center gap-2 mb-1">
-                <Briefcase size={18} /> Open Positions: {company.open_positions}
-              </p>
-              <p className="text-gray-300 text-sm md:text-base flex items-center gap-2 mb-3">
-                <Briefcase size={18} /> Hiring For: {company.hiring_for}
-              </p>
+        {loading ? (
+          <div className="text-center text-gray-600 text-lg">Loading...</div>
+        ) : companies.length === 0 ? (
+          <div className="text-center text-gray-600 text-lg">
+            No hiring companies found.
+          </div>
+        ) : (
+          <div className="py-6 flex justify-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
+              {companies.map((company, index) => (
+                <motion.div
+                  key={company.job_id}
+                  className="bg-gray-900 text-white rounded-3xl shadow-lg p-8 flex flex-col justify-between hover:scale-105 transition-transform duration-300"
+                  custom={index}
+                  initial="hidden"
+                  animate="visible"
+                  variants={cardVariants}
+                  whileHover={{ scale: 1.05 }}
+                  style={{ minHeight: "380px" }} // consistent height
+                >
+                  <div>
+                    <h3 className="text-2xl md:text-3xl font-bold mb-3 text-white">
+                      {company.company_name}
+                    </h3>
+                    <p className="text-gray-300 text-sm md:text-base flex items-center gap-2 mb-1">
+                      <Building2 size={18} /> {company.industry}
+                    </p>
+                    <p className="text-gray-300 text-sm md:text-base flex items-center gap-2 mb-1">
+                      <Building2 size={18} /> {company.city}
+                    </p>
+                    <p className="text-gray-300 text-sm md:text-base flex items-center gap-2 mb-1">
+                      <Briefcase size={18} /> {company.contact_email}
+                    </p>
+                    <p className="text-gray-300 text-sm md:text-base flex items-center gap-2 mb-1">
+                      <Briefcase size={18} /> {company.phone_number}
+                    </p>
+                    <p className="text-gray-300 text-sm md:text-base flex items-center gap-2 mb-1">
+                      <Briefcase size={18} /> Open Positions:{" "}
+                      {company.open_positions}
+                    </p>
+                    <p className="text-gray-300 text-sm md:text-base flex items-center gap-2 mb-3">
+                      <Briefcase size={18} /> Hiring For: {company.hiring_for}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-4 gap-4 flex-wrap">
+                    <p
+                      className={`font-semibold flex items-center gap-2 text-sm md:text-base text-ellipsis overflow-hidden whitespace-normal ${
+                        company.immediate_hiring
+                          ? "text-green-500"
+                          : "text-yellow-400"
+                      }`}
+                      style={{ flex: 1, minWidth: "0" }}
+                    >
+                      {company.immediate_hiring ? (
+                        <>
+                          <Briefcase size={16} /> Immediate Hiring
+                        </>
+                      ) : (
+                        <>
+                          <Clock size={16} /> Hiring Soon
+                        </>
+                      )}
+                    </p>
+
+                    <motion.button
+                      onClick={() => {
+                        const token = localStorage.getItem("token");
+                        if (token) {
+                          handleApplyClick(company.job_id);
+                        } else {
+                          navigate("/signin");
+                        }
+                      }}
+                      disabled={appliedJobs.includes(company.job_id)}
+                      className={`font-semibold px-5 py-3 rounded-full text-sm shadow-md text-center flex-shrink-0 ${
+                        appliedJobs.includes(company.job_id)
+                          ? "bg-gray-600 text-white cursor-not-allowed"
+                          : "bg-green-600 text-white cursor-pointer hover:opacity-90"
+                      }`}
+                    >
+                      {appliedJobs.includes(company.job_id)
+                        ? "Applied"
+                        : "Apply Now"}
+                    </motion.button>
+                  </div>
+                </motion.div>
+              ))}
             </div>
-
-            <div className="flex items-center justify-between mt-4 gap-4 flex-wrap">
-              <p
-                className={`font-semibold flex items-center gap-2 text-sm md:text-base text-ellipsis overflow-hidden whitespace-normal ${
-                  company.immediate_hiring
-                    ? "text-green-500"
-                    : "text-yellow-400"
-                }`}
-                style={{ flex: 1, minWidth: "0" }}
-              >
-                {company.immediate_hiring ? (
-                  <>
-                    <Briefcase size={16} /> Immediate Hiring
-                  </>
-                ) : (
-                  <>
-                    <Clock size={16} /> Hiring Soon
-                  </>
-                )}
-              </p>
-
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  const token = localStorage.getItem("token");
-                  if (token) {
-                    handleApply(company.job_id);
-                  } else {
-                    navigate("/signin");
-                  }
-                }}
-                disabled={appliedJobs.includes(company.job_id)}
-                className={`font-semibold px-5 py-3 rounded-full text-sm shadow-md text-center flex-shrink-0 ${
-                  appliedJobs.includes(company.job_id)
-                    ? "bg-gray-600 text-white cursor-not-allowed"
-                    : "bg-green-600 text-white cursor-pointer hover:opacity-90"
-                }`}
-              >
-                {appliedJobs.includes(company.job_id) ? "Applied" : "Apply Now"}
-              </motion.button>
-            </div>
-          </motion.div>
-        ))}
+          </div>
+        )}
       </div>
-    </div>
-  )}
-</div>
-
 
       <Footer />
+      <ProfileModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        user={user}
+        onProfileUpdated={handleProfileUpdated}
+      />
     </div>
   );
 };
