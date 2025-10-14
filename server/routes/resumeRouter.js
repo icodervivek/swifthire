@@ -4,181 +4,162 @@ import pdf from "pdf-parse-new";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { LLMChain } from "langchain/chains";
 import { PromptTemplate } from "@langchain/core/prompts";
-import { supabase } from "../supabaseClient.js"; // Supabase client
+import { supabase } from "../supabaseClient.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-// ✅ Gemini 2.0 setup
+// Gemini model setup
 const model = new ChatGoogleGenerativeAI({
   model: "gemini-2.0-flash",
   temperature: 0.3,
   apiKey: process.env.GOOGLE_API_KEY,
 });
 
-// ✅ Prompt 1: Extract Skills
+// Step 1: Extract skills prompt
 const extractSkillsPrompt = new PromptTemplate({
-  template: `
-You are an expert resume analyzer. From the text below, extract the most relevant **skills and technologies**.
-Return ONLY a valid JSON array of strings. No explanation, no markdown.
+  template: `You are an expert career assistant.
+Given the following resume text, extract a clean list of **technical skills, frameworks, programming languages, and tools** mentioned.
 
-Example:
-["React", "Node.js", "PostgreSQL", "Python"]
+Rules:
+- Output ONLY a JSON array of skills (like ["React", "Node.js", "Python", "SQL"])
+- No extra text, no markdown formatting.
 
-Resume Text:
-{text}
-`,
+Resume text:
+{text}`,
   inputVariables: ["text"],
 });
 
-// ✅ Prompt 2: Job Matching
+// Step 2: Job matching prompt
 const jobMatchPrompt = new PromptTemplate({
-  template: `
-You are an intelligent hiring assistant.
-Given:
-- Candidate skills: {skills}
-- Available jobs: {jobs}
+  template: `You are an intelligent job recommender.
+Given the candidate's skills and the list of available jobs, select the **most relevant job positions** that best match the skills.
 
-Match the candidate to the most relevant jobs.
+Rules:
+- Return ONLY a JSON array.
+- Each object should include job_id, job_title, company, and reason_for_match (1-2 lines explaining why it matches).
+- If there are no matching jobs, return an empty array [].
 
-Return a **pure JSON array** in this format (no markdown, no text):
+Candidate Skills:
+{skills}
 
-[
-  {{
-    "job_id": 0,
-    "job_title": "Job Title",
-    "match_reason": "Reason why this candidate fits",
-    "confidence": 0
-  }}
-]
-`,
+Available Jobs:
+{jobs}`,
   inputVariables: ["skills", "jobs"],
 });
 
-// ✅ LangChain Chains
+// LangChain chains
 const extractSkillsChain = new LLMChain({
   llm: model,
   prompt: extractSkillsPrompt,
 });
-const jobMatchChain = new LLMChain({ llm: model, prompt: jobMatchPrompt });
 
-// ✅ Upload Resume Route
+const jobMatchChain = new LLMChain({
+  llm: model,
+  prompt: jobMatchPrompt,
+});
+
+// 🧠 API Route — POST /upload
 router.post("/upload", upload.single("pdf"), async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ error: "No file uploaded." });
-
-    // Step 1: Extract PDF Text
-    const data = await pdf(req.file.buffer);
-    const pdfText = data.text;
-
-    // Step 2: Extract Skills
-    const skillRes = await extractSkillsChain.call({ text: pdfText });
-    let extractedSkills = [];
-
-    try {
-      let cleanedText = skillRes.text
-        .replace(/```json/g, "")
-        .replace(/```/g, "")
-        .replace(/^json\s*/i, "")
-        .trim();
-      extractedSkills = JSON.parse(cleanedText);
-    } catch {
-      extractedSkills = skillRes.text
-        .replace(/^json\s*/i, "")
-        .split(/,|\n|;/)
-        .map((s) => s.replace(/[`[\]]/g, "").trim())
-        .filter(Boolean);
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ error: "No file uploaded. Please upload a valid PDF resume." });
     }
 
-    const cleanSkills = extractedSkills.map((s) => s.trim()).filter(Boolean);
+    // Convert to buffer & extract text
+    const buffer = req.file.buffer;
+    const data = await pdf(buffer);
+    const resumeText = data.text.trim();
 
-    // Step 3: Fetch Jobs
+    if (!resumeText) {
+      return res
+        .status(400)
+        .json({ error: "Uploaded PDF is blank or unreadable." });
+    }
+
+    // Step 1: Extract skills from resume
+    const skillsResponse = await extractSkillsChain.call({ text: resumeText });
+    const cleanSkills = skillsResponse.text
+      .replace(/```json|```/g, "")
+      .trim();
+
+    let skillsJson = [];
+    try {
+      skillsJson = JSON.parse(cleanSkills);
+      if (!Array.isArray(skillsJson)) throw new Error("Not an array");
+    } catch (err) {
+      console.warn("Failed to parse skills JSON. Raw text used.");
+      skillsJson = [];
+    }
+
+    if (skillsJson.length === 0) {
+      return res.status(200).json({
+        message: "No identifiable technical skills found in the resume.",
+        jobs: [],
+      });
+    }
+
+    // Step 2: Fetch jobs from Supabase
     const { data: jobs, error } = await supabase
       .from("jobs")
       .select(
         "job_id, hiring_for, company_name, city, industry, open_positions, contact_email"
       );
 
-    if (error) return res.status(500).json({ error: "Failed to fetch jobs." });
-
-    // Step 4: Match Jobs using LLM
-    const jobsData = JSON.stringify(
-      jobs.map((job) => ({
-        job_id: job.job_id,
-        job_title: job.hiring_for,
-        company: job.company_name,
-        city: job.city,
-        industry: job.industry,
-        open_positions: job.open_positions,
-        contact: job.contact_email,
-      }))
-    );
-
-    const matchRes = await jobMatchChain.call({
-      skills: cleanSkills.join(", "),
-      jobs: jobsData,
-    });
-
-    // Step 5: Parse Matches
-    let matches = [];
-    try {
-      const cleanedText = matchRes.text
-        .replace(/```json/g, "")
-        .replace(/```/g, "")
-        .replace(/^.*?\[/s, "[")
-        .replace(/]([^]*?)$/s, "]")
-        .trim();
-      matches = JSON.parse(cleanedText);
-      if (!Array.isArray(matches))
-        throw new Error("AI response is not an array");
-    } catch (err) {
-      console.warn("AI match JSON parse failed:", err);
-      matches = [
-        {
-          job_id: null,
-          job_title: "Parsing Failed",
-          match_reason: matchRes.text.trim().slice(0, 200),
-          confidence: 0,
-        },
-      ];
+    if (error) {
+      console.error("Supabase error:", error);
+      return res.status(500).json({ error: "Failed to fetch jobs." });
     }
 
-    // Step 6: Enrich matches with company details
-    const matchedJobs = matches
-      .map((match) => {
-        const job = jobs.find((j) => j.job_id === match.job_id);
-        return job
-          ? {
-              ...job,
-              match_reason: match.match_reason,
-              confidence: match.confidence,
-            }
-          : null;
-      })
-      .filter(Boolean);
+    const jobsData = jobs.map((job) => ({
+      job_id: job.job_id,
+      job_title: job.hiring_for,
+      company: job.company_name,
+      city: job.city,
+      industry: job.industry,
+      open_positions: job.open_positions,
+      contact_email: job.contact_email,
+    }));
 
-    // Step 7: Create clean description
-    const description =
-      matchedJobs.length > 0
-        ? `Based on your skills (${cleanSkills.join(
-            ", "
-          )}), these jobs are available.`
-        : `No strong matches found for your skills (${cleanSkills.join(
-            ", "
-          )}).`;
+    // Step 3: Use Gemini to find best job matches
+    const matchResponse = await jobMatchChain.call({
+      skills: JSON.stringify(skillsJson),
+      jobs: JSON.stringify(jobsData),
+    });
 
-    // ✅ Send single response
-    res.json({
-      message: matchedJobs.length
-        ? "Job recommendations found."
-        : "No strong matches found.",
-      description,
-      extractedSkills: cleanSkills,
-      matchedJobs,
+    const cleanedMatch = matchResponse.text
+      .replace(/```json|```/g, "")
+      .trim();
+
+    let matchedJobs = [];
+    try {
+      matchedJobs = JSON.parse(cleanedMatch);
+      if (!Array.isArray(matchedJobs)) throw new Error("Not an array");
+    } catch (err) {
+      console.warn("Match JSON parse failed.");
+      matchedJobs = [];
+    }
+
+    // Step 4: Return result
+    if (matchedJobs.length === 0) {
+      return res.status(200).json({
+        message: "No job positions available matching your resume skills.",
+        jobs: [],
+      });
+    }
+
+    return res.status(200).json({
+      message: "Matching job positions found.",
+      skills: skillsJson,
+      jobs: matchedJobs,
     });
   } catch (err) {
-    console.error("Resume processing error:", err);
-    res.status(500).json({ error: "Failed to process uploaded resume." });
+    console.error("Processing error:", err);
+    res
+      .status(500)
+      .json({ error: "Failed to process the resume. Please try again." });
   }
 });
 
