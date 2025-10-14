@@ -25,17 +25,17 @@ const RecruiterNav = () => {
   return (
     <nav className="text-white px-6 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link to="/">
-          <h1 className="text-2xl font-bold">SwiftHire</h1>
+        <Link to="/recruiter">
+          <h1 className="text-2xl font-bold">Recruiter Dashboard</h1>
         </Link>
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-6">
           {isAuthenticated ? (
             <>
-              <Link to="/recruiter">
+              <Link to="/">
                 <button className="bg-[#0c6b34] cursor-pointer text-white rounded-full px-5 py-2 hover:bg-[#0d8d42] transition">
-                  Dashboard
+                  Homepage
                 </button>
               </Link>
               <button
@@ -47,11 +47,16 @@ const RecruiterNav = () => {
             </>
           ) : (
             <>
-              <Link to="/recruiter/signin">
+             <Link to="/">
                 <button className="bg-[#0c6b34] cursor-pointer text-white rounded-full px-5 py-2 hover:bg-[#0d8d42] transition">
-                  Sign In
+                  Homepage
                 </button>
               </Link>
+              {/* <Link to="/recruiter/signin">
+                <button className="bg-[#7e0c7e] cursor-pointer text-white rounded-full px-5 py-2 hover:bg-[#7e0d8d] transition">
+                  Sign In
+                </button>
+              </Link> */}
             </>
           )}
         </div>
@@ -83,11 +88,11 @@ const RecruiterNav = () => {
           {isAuthenticated ? (
             <>
               <Link
-                to="/recruiter"
+                to="/"
                 className="w-full flex justify-center"
               >
                 <button className="w-11/12 bg-[#0c6b34] text-white rounded-full px-5 py-2 hover:bg-[#0d8d42] transition cursor-pointer">
-                  Dashboard
+                  Homepage
                 </button>
               </Link>
               <button
@@ -100,11 +105,11 @@ const RecruiterNav = () => {
           ) : (
             <>
               <Link
-                to="/recruiter/signin"
+                to="/"
                 className="w-full flex justify-center"
               >
-                <button className="w-11/12 bg-[#73248b] text-white rounded-full px-5 py-2 hover:bg-[#402947] transition cursor-pointer">
-                  Sign In
+                <button className="w-11/12 bg-[#0c6b34] text-white rounded-full px-5 py-2 hover:bg-[#0d8d42] transition cursor-pointer">
+                  Homepage
                 </button>
               </Link>
             </>
