@@ -243,6 +243,36 @@ app.post("/apply/:jobId", verifyToken, async (req, res) => {
   }
 });
 
+
+// PUT /user/update-profile
+// -----------------------
+// Update user profile
+// -----------------------
+app.put("/user/update-profile", verifyToken, async (req, res) => {
+  const userId = req.user.id;
+  const { experience, previous_job_role, contact_number } = req.body;
+
+  if (!experience || !previous_job_role || !contact_number)
+    return res.status(400).json({ message: "All fields are required" });
+
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .update({ experience, previous_job_role, contact_number })
+      .eq("id", userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({ success: true, user: data, message: "Profile updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+
 // -----------------------
 // JWT middleware
 // -----------------------
