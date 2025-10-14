@@ -65,9 +65,9 @@ const FirstSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center bg-gray-800 py-16 md:py-20 px-10 rounded-2xl shadow-xl mt-10 mx-auto max-w-xl"
+          className="text-center bg-gray-800 py-16 md:py-8 px-12 rounded-2xl shadow-xl mt-10 mx-auto "
         >
-          <p className="text-3xl md:text-4xl font-extrabold mb-6 text-white">
+          <p className="text-3xl md:text-3xl font-extrabold mb-6 text-white">
             Discover Your Perfect Job with AI
           </p>
           <Link to="/find-job/upload-resume">
