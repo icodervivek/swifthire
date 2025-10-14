@@ -37,7 +37,7 @@ const ProfileModal = ({ isOpen, onClose, user, onProfileUpdated }) => {
       <h2 className="text-2xl font-bold mb-4">Complete Your Profile</h2>
       <input
         type="text"
-        placeholder="Experience"
+        placeholder="Experience (in months)"
         value={experience}
         onChange={(e) => setExperience(e.target.value)}
         className="w-full mb-3 p-2 rounded bg-gray-800 border border-gray-600"
