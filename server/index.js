@@ -4,6 +4,7 @@ import cors from "cors";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { supabase } from "./supabaseClient.js";
+import multer from "multer";
 
 import resumeRouter from "./routes/resumeRouter.js";
 import recruiterRouter from "./routes/recruiterRouter.js";
@@ -250,15 +251,21 @@ app.post("/apply/:jobId", verifyToken, async (req, res) => {
 // -----------------------
 app.put("/user/update-profile", verifyToken, async (req, res) => {
   const userId = req.user.id;
-  const { experience, previous_job_role, contact_number } = req.body;
+  const { experience, previous_job_role, contact_number, resume } = req.body;
 
+  // Mandatory fields check
   if (!experience || !previous_job_role || !contact_number)
     return res.status(400).json({ message: "All fields are required" });
 
   try {
+    const updateData = { experience, previous_job_role, contact_number };
+
+    // Only update resume if provided
+    if (resume) updateData.resume = resume;
+
     const { data, error } = await supabase
       .from("users")
-      .update({ experience, previous_job_role, contact_number })
+      .update(updateData)
       .eq("id", userId)
       .select()
       .single();
@@ -271,6 +278,7 @@ app.put("/user/update-profile", verifyToken, async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
+
 
 
 // -----------------------
