@@ -222,14 +222,14 @@ router.post("/jobs", verifyToken, async (req, res) => {
 router.get("/jobs", async (req, res) => {
   try {
     const search = req.query.search?.trim().replace(/\s+/g, " ") || "";
-    console.log("🔍 Search term received:", search || "<empty>");
+    // console.log("🔍 Search term received:", search || "<empty>");
 
     let query = supabase.from("jobs").select("*");
 
     if (search) {
       // Search across multiple fields using OR
       const orString = `hiring_for.ilike.%${search}%,company_name.ilike.%${search}%,industry.ilike.%${search}%,city.ilike.%${search}%`;
-      console.log("🧠 OR condition:", orString);
+      // console.log("🧠 OR condition:", orString);
       query = query.or(orString);
     }
 
@@ -240,7 +240,7 @@ router.get("/jobs", async (req, res) => {
 
     if (error) throw error;
 
-    console.log("✅ Jobs returned:", data?.length);
+    // console.log("✅ Jobs returned:", data?.length);
     res.status(200).json({ success: true, data });
   } catch (err) {
     console.error("🔥 Error fetching jobs:", err.message);
