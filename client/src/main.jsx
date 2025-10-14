@@ -8,7 +8,6 @@ import Signin from "./components/AuthPages/Signin.jsx";
 import Profile from "./components/AuthPages/Profile.jsx";
 import About from "./components/About.jsx";
 import Contact from "./components/Contact.jsx";
-import JobSeeker from "./JobSeeker.jsx";
 import HiringCompanies from "./HiringCompanies.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import UploadResume from "./UploadResume.jsx";
@@ -96,14 +95,7 @@ createRoot(document.getElementById("root")).render(
             </ProtectedRecruiterRoute>
           }
         ></Route>
-        <Route
-          path="/workers"
-          element={
-            <ProtectedRoute>
-              <JobSeeker />
-            </ProtectedRoute>
-          }
-        />
+     
         <Route path="/find-job" element={<HiringCompanies />} />
         <Route
           path="/find-job/upload-resume"
