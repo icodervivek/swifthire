@@ -52,24 +52,30 @@ const HiringCompanies = () => {
     fetchCompaniesAndAppliedJobs();
   }, []);
 
-  useEffect(() => {
+ useEffect(() => {
   const fetchCompanies = async () => {
-    setLoading(true);
-    const res = await axios.get(`${import.meta.env.VITE_API_URL}/recruiter/jobs`);
-    const all = res.data.data;
+    try {
+      setLoading(true);
+      const url = `${import.meta.env.VITE_API_URL}/recruiter/jobs`;
 
-    const filtered = searchQuery
-      ? all.filter((job) =>
-          job.hiring_for?.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      : all;
+      // Always call API — if searchQuery is empty, show all jobs
+      const res = await axios.get(url, {
+        params: searchQuery ? { search: searchQuery } : {},
+      });
 
-    setCompanies(filtered);
-    setLoading(false);
+      setCompanies(res.data.data || []);
+    } catch (err) {
+      console.error("Error fetching companies:", err);
+      setCompanies([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   fetchCompanies();
 }, [searchQuery]);
+
+
 
 
   const cardVariants = {

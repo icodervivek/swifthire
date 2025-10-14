@@ -221,24 +221,24 @@ router.post("/jobs", verifyToken, async (req, res) => {
 // GET /jobs
 router.get("/jobs", async (req, res) => {
   try {
-    const search = req.query.search?.trim() || "";
-    console.log("🔍 Search term received:", search);
+    const search = req.query.search?.trim().replace(/\s+/g, " ") || "";
+    console.log("🔍 Search term received:", search || "<empty>");
 
-    // build base query
-    const baseQuery = supabase
-      .from("jobs")
-      .select("*")
-      .order("created_at", { ascending: false });
+    let query = supabase.from("jobs").select("*");
 
-    // apply filter only if search is not empty
-    const { data, error } = search
-      ? await baseQuery.ilike("hiring_for", `%${search}%`)
-      : await baseQuery;
-
-    if (error) {
-      console.error("❌ Supabase error:", error);
-      throw error;
+    if (search) {
+      // Search across multiple fields using OR
+      const orString = `hiring_for.ilike.%${search}%,company_name.ilike.%${search}%,industry.ilike.%${search}%,city.ilike.%${search}%`;
+      console.log("🧠 OR condition:", orString);
+      query = query.or(orString);
     }
+
+    // Apply ordering after filtering
+    query = query.order("created_at", { ascending: false });
+
+    const { data, error } = await query;
+
+    if (error) throw error;
 
     console.log("✅ Jobs returned:", data?.length);
     res.status(200).json({ success: true, data });
