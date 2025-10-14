@@ -33,12 +33,17 @@ Resume text:
 // Step 2: Job matching prompt
 const jobMatchPrompt = new PromptTemplate({
   template: `You are an intelligent job recommender.
-Given the candidate's skills and the list of available jobs, select the **most relevant job positions** that best match the skills.
+Given the candidate's skills and the list of available jobs, select the **most relevant job positions** that best match the skills. Check technical skills as well as non technical skiils.
+
+Given the candidate's skills and the list of available jobs (including technical and non-technical roles), select the most relevant job positions.
+
 
 Rules:
 - Return ONLY a JSON array.
 - Each object should include job_id, job_title, company, and reason_for_match (1-2 lines explaining why it matches).
 - If there are no matching jobs, return an empty array [].
+- Output ONLY a JSON array of skills (like ["React", "Node.js", "Python", "SQL", "Customer Service", "HR Management", "Team Leadership"])
+
 
 Candidate Skills:
 {skills}
@@ -81,9 +86,7 @@ router.post("/upload", upload.single("pdf"), async (req, res) => {
 
     // Step 1: Extract skills from resume
     const skillsResponse = await extractSkillsChain.call({ text: resumeText });
-    const cleanSkills = skillsResponse.text
-      .replace(/```json|```/g, "")
-      .trim();
+    const cleanSkills = skillsResponse.text.replace(/```json|```/g, "").trim();
 
     let skillsJson = [];
     try {
@@ -129,9 +132,7 @@ router.post("/upload", upload.single("pdf"), async (req, res) => {
       jobs: JSON.stringify(jobsData),
     });
 
-    const cleanedMatch = matchResponse.text
-      .replace(/```json|```/g, "")
-      .trim();
+    const cleanedMatch = matchResponse.text.replace(/```json|```/g, "").trim();
 
     let matchedJobs = [];
     try {

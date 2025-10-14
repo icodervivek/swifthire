@@ -5,6 +5,7 @@ import { toast, Bounce } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ProfileModal from "./components/ProfileModal";
 
 const UploadResume = () => {
   const [file, setFile] = useState(null);
@@ -16,6 +17,9 @@ const UploadResume = () => {
   const [appliedJobs, setAppliedJobs] = useState([]);
   const navigate = useNavigate();
   const inputRef = useRef(null);
+  const [user, setUser] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [pendingJobId, setPendingJobId] = useState(null);
 
   // Handle file selection
   const handleFileChange = (e) => {
@@ -68,8 +72,8 @@ const UploadResume = () => {
       setUploaded(true);
 
       setUploadData(data);
-      setMatchedJobs(data.matchedJobs || []);
-      setSkills(data.extractedSkills || []);
+      setMatchedJobs(data.jobs || []); // ✅ backend sends "jobs"
+      setSkills(data.skills || []); // ✅ backend sends "skills"
     } catch (err) {
       console.error(err);
       setUploading(false);
@@ -135,6 +139,45 @@ const UploadResume = () => {
 
     fetchAppliedJobs();
   }, []);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(res.data.user);
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const handleApplyClick = (jobId) => {
+    // If user is logged in but profile incomplete
+    if (
+      user &&
+      (!user.experience || !user.previous_job_role || !user.contact_number)
+    ) {
+      setPendingJobId(jobId);
+      setShowModal(true);
+      return;
+    }
+
+    // If profile complete or no user (login check handled elsewhere)
+    handleApply(jobId);
+  };
+
+  // After profile update from modal
+  const handleProfileUpdated = (updatedUser) => {
+    setUser(updatedUser);
+    if (pendingJobId) handleApply(pendingJobId);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0b0b0b] text-white">
@@ -240,15 +283,10 @@ const UploadResume = () => {
                   key={job.job_id}
                   className="p-6 border border-gray-700 rounded-lg hover:bg-gray-700 transition"
                 >
-                  <p className="font-semibold text-lg">{job.company_name}</p>
-                  <p className="text-gray-400">Role: {job.hiring_for}</p>
-                  <p className="text-gray-400">City: {job.city}</p>
-                  <p className="text-gray-400">
-                    Open Positions: {job.open_positions || "N/A"}
-                  </p>
-                  <p className="text-gray-400">
-                    Contact: {job.contact_email || "N/A"}
-                  </p>
+                  <p className="font-semibold text-lg">{job.company}</p>
+                  <p className="text-gray-400">Role: {job.job_title}</p>
+                  <p className="text-gray-400">{job.reason_for_match}</p>
+
                   <div className="mt-4 flex justify-center">
                     {appliedJobs.includes(Number(job.job_id)) ? (
                       <button
@@ -261,12 +299,30 @@ const UploadResume = () => {
                       <button
                         onClick={() => {
                           const token = localStorage.getItem("token");
-                          if (token) handleApply(job.job_id);
-                          else navigate("/signin");
+                          if (token) {
+                            handleApplyClick(job.job_id);
+                          } else {
+                            toast.info(
+                              "To apply for job, please login first!",
+                              {
+                                position: "top-center",
+                                autoClose: 2000,
+                                transition: Bounce,
+                              }
+                            );
+                            setTimeout(() => navigate("/signin"), 2000);
+                          }
                         }}
-                        className="px-6 py-2 w-full rounded-full text-sm font-semibold bg-green-600 hover:bg-green-700 text-white cursor-pointer transition-colors"
+                        disabled={appliedJobs.includes(Number(job.job_id))}
+                        className={`px-6 py-2 w-full rounded-full text-sm font-semibold ${
+                          appliedJobs.includes(Number(job.job_id))
+                            ? "bg-gray-600 cursor-not-allowed"
+                            : "bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+                        }`}
                       >
-                        Apply Now
+                        {appliedJobs.includes(Number(job.job_id))
+                          ? "Applied"
+                          : "Apply Now"}
                       </button>
                     )}
                   </div>
@@ -277,6 +333,12 @@ const UploadResume = () => {
         </div>
       )}
       <Footer />
+      <ProfileModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        user={user}
+        onProfileUpdated={handleProfileUpdated}
+      />
     </div>
   );
 };
