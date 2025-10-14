@@ -35,7 +35,7 @@ const Navbar = () => {
       autoClose: 1500,
       transition: Bounce,
     });
-    setTimeout(() => navigate("/signin"), 1500);
+    setTimeout(() => navigate("/"), 1500);
   };
 
   // ✅ Active link styling
