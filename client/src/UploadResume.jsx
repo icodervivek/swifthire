@@ -276,60 +276,56 @@ const UploadResume = () => {
             <p className="text-gray-400 mb-6">{uploadData.description}</p>
           )}
 
-          {matchedJobs.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {matchedJobs.map((job) => (
-                <div
-                  key={job.job_id}
-                  className="p-6 border border-gray-700 rounded-lg hover:bg-gray-700 transition"
-                >
-                  <p className="font-semibold text-lg">{job.company}</p>
-                  <p className="text-gray-400">Role: {job.job_title}</p>
-                  <p className="text-gray-400">{job.reason_for_match}</p>
+        {matchedJobs.length > 0 && (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {matchedJobs.map((job) => (
+      <div
+        key={job.job_id}
+        className="p-6 border border-gray-700 rounded-lg hover:bg-gray-700 transition flex flex-col justify-between min-h-[250px]"
+      >
+        <div>
+          <p className="font-semibold text-lg">{job.company}</p>
+          <p className="text-gray-400">Role: {job.job_title}</p>
+          <p className="text-gray-400">{job.reason_for_match}</p>
+        </div>
 
-                  <div className="mt-4 flex justify-center">
-                    {appliedJobs.includes(Number(job.job_id)) ? (
-                      <button
-                        disabled
-                        className="px-6 py-2 w-full rounded-full text-sm font-semibold bg-gray-600 cursor-not-allowed"
-                      >
-                        Applied
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          const token = localStorage.getItem("token");
-                          if (token) {
-                            handleApplyClick(job.job_id);
-                          } else {
-                            toast.info(
-                              "To apply for job, please login first!",
-                              {
-                                position: "top-center",
-                                autoClose: 2000,
-                                transition: Bounce,
-                              }
-                            );
-                            setTimeout(() => navigate("/signin"), 2000);
-                          }
-                        }}
-                        disabled={appliedJobs.includes(Number(job.job_id))}
-                        className={`px-6 py-2 w-full rounded-full text-sm font-semibold ${
-                          appliedJobs.includes(Number(job.job_id))
-                            ? "bg-gray-600 cursor-not-allowed"
-                            : "bg-green-600 hover:bg-green-700 text-white cursor-pointer"
-                        }`}
-                      >
-                        {appliedJobs.includes(Number(job.job_id))
-                          ? "Applied"
-                          : "Apply Now"}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+        <div className="mt-4 flex justify-center">
+          {appliedJobs.includes(Number(job.job_id)) ? (
+            <button
+              disabled
+              className="px-6 py-2 w-full rounded-full text-sm font-semibold bg-gray-600 cursor-not-allowed"
+            >
+              Applied
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                const token = localStorage.getItem("token");
+                if (token) {
+                  handleApplyClick(job.job_id);
+                } else {
+                  toast.info(
+                    "To apply for job, please login first!",
+                    {
+                      position: "top-center",
+                      autoClose: 2000,
+                      transition: Bounce,
+                    }
+                  );
+                  setTimeout(() => navigate("/signin"), 2000);
+                }
+              }}
+              className="px-6 py-2 w-full rounded-full text-sm font-semibold bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+            >
+              Apply Now
+            </button>
           )}
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
         </div>
       )}
       <Footer />
