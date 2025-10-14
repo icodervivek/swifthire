@@ -34,7 +34,7 @@ Whether you're a recruiter looking to fill positions quickly or a job seeker sea
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Getting Started (Manual Setup)
 
 ### 1. Clone the repository
 
@@ -98,6 +98,62 @@ Open your browser at **[http://localhost:5173](http://localhost:5173)** to see t
 
 ---
 
+## 🐳 Running Locally with Docker
+
+You can run the entire project (frontend + backend) using Docker Compose for an easier local setup.
+
+### 1️⃣ Clone the repository
+```bash
+git clone https://github.com/icodervivek/swifthire.git
+cd swifthire
+```
+
+### 2️⃣ Create environment files
+
+You must create `.env` files **inside both** `server/` and `client/` folders before building.
+
+#### `server/.env`
+```env
+PORT=3000
+SUPABASE_URL=https://xyz.supabase.co
+SUPABASE_SERVICE_KEY=your_service_role_key
+JWT_SECRET=your_secret_key
+GOOGLE_API_KEY=your_gemini_api_key
+FRONTEND_ORIGIN=http://localhost:5173
+```
+
+#### `client/.env`
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+### 3️⃣ Build and start containers
+```bash
+docker-compose up --build
+```
+
+This command:
+- Builds the Docker images for backend and frontend.
+- Starts both containers automatically.
+- Loads your `.env` variables securely (not exposed publicly).
+
+### 4️⃣ Access the app
+Once the containers are running:
+- Frontend → **http://localhost:5173**
+- Backend → **http://localhost:3000**
+
+### 5️⃣ Run in background (optional)
+```bash
+docker-compose up -d
+```
+
+To stop everything:
+```bash
+docker-compose down
+```
+
+---
+
 ## 📂 Project Structure
 
 ```
@@ -105,6 +161,7 @@ swifthire/
 │
 ├─ client/           # React frontend
 ├─ server/           # Node.js + Express backend
+├─ docker-compose.yml
 ├─ README.md
 ```
 
@@ -128,4 +185,3 @@ Feel free to check the [issues page](https://github.com/icodervivek/swifthire/is
 ---
 
 **SwiftHire** – Making hiring simple, fast, and reliable with AI-powered job recommendations and recruiter management using Google Gemini 2.0 Flash API + LangChain. 💼✨
-
