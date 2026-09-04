@@ -23,41 +23,39 @@ const RecruiterNav = () => {
   };
 
   return (
-    <nav className="text-white px-6 py-4">
+    <nav className="text-white px-6 py-4 bg-[#08090a]/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link to="/recruiter">
-          <h1 className="text-2xl font-bold">Recruiter Dashboard</h1>
+        <Link to="/recruiter" className="flex items-center gap-2">
+          <span className="text-xl font-extrabold tracking-tight">
+            Swift<span className="text-[#8b5cf6]">Hire</span>
+          </span>
+          <span className="hidden sm:inline text-xs font-semibold uppercase tracking-wider text-[#8b5cf6] bg-[#8b5cf6]/10 border border-[#8b5cf6]/30 rounded-full px-2 py-0.5">
+            Recruiter
+          </span>
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-3">
           {isAuthenticated ? (
             <>
               <Link to="/">
-                <button className="bg-[#0c6b34] cursor-pointer text-white rounded-full px-5 py-2 hover:bg-[#0d8d42] transition">
+                <button className="btn-ghost cursor-pointer px-5 py-2 text-sm">
                   Homepage
                 </button>
               </Link>
               <button
                 onClick={handleSignOut}
-                className="bg-[#73248b] cursor-pointer text-white rounded-full px-5 py-2 hover:bg-[#402947] transition"
+                className="bg-red-500/90 hover:bg-red-500 cursor-pointer text-white rounded-full px-5 py-2 text-sm font-medium transition"
               >
                 Sign Out
               </button>
             </>
           ) : (
-            <>
-             <Link to="/">
-                <button className="bg-[#0c6b34] cursor-pointer text-white rounded-full px-5 py-2 hover:bg-[#0d8d42] transition">
-                  Homepage
-                </button>
-              </Link>
-              {/* <Link to="/recruiter/signin">
-                <button className="bg-[#7e0c7e] cursor-pointer text-white rounded-full px-5 py-2 hover:bg-[#7e0d8d] transition">
-                  Sign In
-                </button>
-              </Link> */}
-            </>
+            <Link to="/">
+              <button className="btn-ghost cursor-pointer px-5 py-2 text-sm">
+                Homepage
+              </button>
+            </Link>
           )}
         </div>
 
@@ -91,32 +89,30 @@ const RecruiterNav = () => {
                 to="/"
                 className="w-full flex justify-center"
               >
-                <button className="w-11/12 bg-[#0c6b34] text-white rounded-full px-5 py-2 hover:bg-[#0d8d42] transition cursor-pointer">
+                <button className="btn-ghost w-11/12 px-5 py-2 cursor-pointer">
                   Homepage
                 </button>
               </Link>
               <button
                 onClick={handleSignOut}
-                className="w-11/12 bg-[#73248b] text-white rounded-full px-5 py-2 hover:bg-[#402947] transition cursor-pointer"
+                className="w-11/12 bg-red-500/90 hover:bg-red-500 text-white rounded-full px-5 py-2 transition cursor-pointer"
               >
                 Sign Out
               </button>
             </>
           ) : (
-            <>
-              <Link
-                to="/"
-                className="w-full flex justify-center"
-              >
-                <button className="w-11/12 bg-[#0c6b34] text-white rounded-full px-5 py-2 hover:bg-[#0d8d42] transition cursor-pointer">
-                  Homepage
-                </button>
-              </Link>
-            </>
+            <Link
+              to="/"
+              className="w-full flex justify-center"
+            >
+              <button className="btn-ghost w-11/12 px-5 py-2 cursor-pointer">
+                Homepage
+              </button>
+            </Link>
           )}
         </div>
       )}
-      <ToastContainer />
+      <ToastContainer theme="dark" />
     </nav>
   );
 };

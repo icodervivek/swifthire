@@ -45,11 +45,11 @@ const Navbar = () => {
       : "text-gray-300 hover:text-[#57c785]";
 
   return (
-    <nav className="bg-[#0b0b0b]/90 backdrop-blur-md fixed top-0 left-0 right-0 z-50 border-b border-gray-800">
+    <nav className="bg-[#08090a]/80 backdrop-blur-xl fixed top-0 left-0 right-0 z-50 border-b border-white/10">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="text-2xl font-bold text-[#57c785]">
-          SwiftHire
+        <Link to="/" className="text-2xl font-extrabold tracking-tight text-white">
+          Swift<span className="text-[#57c785]">Hire</span>
         </Link>
 
         {/* Desktop Menu */}
@@ -68,18 +68,17 @@ const Navbar = () => {
           </ul>
 
           {/* Auth Buttons */}
-          {/* Auth Buttons */}
           <div className="flex items-center gap-3 ml-6">
             {!isAuthenticated && !isRecruiter ? (
               <>
                 <Link to="/signin">
-                  <button className="px-5 py-2 rounded-full bg-[#73248b] hover:bg-[#5b1b70] transition text-white font-medium shadow-md hover:shadow-lg cursor-pointer">
+                  <button className="btn-primary px-5 py-2 text-sm cursor-pointer">
                     Candidate Sign In
                   </button>
                 </Link>
 
                 <Link to={isRecruiter ? "/recruiter" : "/recruiter/signin"}>
-                  <button className="px-5 py-2 rounded-full bg-[#1E4633] hover:bg-[#163528] transition text-white font-medium shadow-md hover:shadow-lg cursor-pointer">
+                  <button className="btn-recruiter px-5 py-2 text-sm cursor-pointer">
                     {isRecruiter ? "Dashboard" : "Recruiter Sign In"}
                   </button>
                 </Link>
@@ -87,20 +86,20 @@ const Navbar = () => {
             ) : isAuthenticated ? (
               <>
                 <Link to="/profile">
-                  <button className="px-5 py-2 rounded-full bg-[#1E4633] hover:bg-[#163528] transition text-white font-medium shadow-md hover:shadow-lg cursor-pointer">
+                  <button className="btn-ghost px-5 py-2 text-sm cursor-pointer">
                     Profile
                   </button>
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="px-5 py-2 rounded-full bg-red-600 hover:bg-red-700 transition text-white font-medium shadow-md hover:shadow-lg cursor-pointer"
+                  className="px-5 py-2 rounded-full bg-red-500/90 hover:bg-red-500 transition text-white text-sm font-medium cursor-pointer"
                 >
                   Sign Out
                 </button>
               </>
             ) : isRecruiter ? (
               <Link to="/recruiter">
-                <button className="px-5 py-2 rounded-full bg-[#1E4633] hover:bg-[#163528] transition text-white font-medium shadow-md hover:shadow-lg cursor-pointer">
+                <button className="btn-recruiter px-5 py-2 text-sm cursor-pointer">
                   Dashboard
                 </button>
               </Link>
@@ -110,7 +109,7 @@ const Navbar = () => {
 
         {/* Mobile Menu Toggle */}
         <button
-          className="md:hidden text-white"
+          className="md:hidden text-white cursor-pointer"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           {isMenuOpen ? <X size={26} /> : <Menu size={26} />}
@@ -119,7 +118,7 @@ const Navbar = () => {
 
       {/* Mobile Dropdown Menu */}
       <div
-        className={`md:hidden bg-[#0b0b0b]/95 backdrop-blur-md border-t border-gray-800 transition-all duration-300 overflow-hidden ${
+        className={`md:hidden bg-[#08090a]/95 backdrop-blur-xl border-t border-white/10 transition-all duration-300 overflow-hidden ${
           isMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
@@ -149,12 +148,12 @@ const Navbar = () => {
           {!isAuthenticated ? (
             <>
               <Link to="/signin" onClick={() => setIsMenuOpen(false)}>
-                <button className="w-full px-5 py-2 rounded-full bg-[#73248b] hover:bg-[#5b1b70] transition text-white font-medium cursor-pointer">
+                <button className="btn-primary w-full px-5 py-2 cursor-pointer">
                   User Sign In
                 </button>
               </Link>
               <Link to="/recruiter/signin" onClick={() => setIsMenuOpen(false)}>
-                <button className="w-full px-5 py-2 rounded-full bg-[#1E4633] hover:bg-[#163528] transition text-white font-medium cursor-pointer">
+                <button className="btn-recruiter w-full px-5 py-2 cursor-pointer">
                   Recruiter Sign In
                 </button>
               </Link>
@@ -162,7 +161,7 @@ const Navbar = () => {
           ) : (
             <>
               <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
-                <button className="w-full px-5 py-2 rounded-full bg-[#1E4633] hover:bg-[#163528] transition text-white font-medium cursor-pointer">
+                <button className="btn-ghost w-full px-5 py-2 cursor-pointer">
                   Profile
                 </button>
               </Link>
@@ -171,7 +170,7 @@ const Navbar = () => {
                   handleLogout();
                   setIsMenuOpen(false);
                 }}
-                className="w-full px-5 py-2 rounded-full bg-red-600 hover:bg-red-700 transition text-white font-medium cursor-pointer"
+                className="w-full px-5 py-2 rounded-full bg-red-500/90 hover:bg-red-500 transition text-white font-medium cursor-pointer"
               >
                 Sign Out
               </button>
@@ -180,7 +179,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      <ToastContainer />
+      <ToastContainer theme="dark" />
     </nav>
   );
 };
