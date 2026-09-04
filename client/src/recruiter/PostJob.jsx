@@ -112,16 +112,15 @@ const PostJob = () => {
     }
   };
 
-  const inputClass =
-    "w-full h-11 text-base border border-gray-300 rounded-lg px-4 focus:ring-2 focus:ring-[#1E4633] outline-none";
+  const inputClass = "field field-recruiter w-full h-11 text-base rounded-lg px-4";
 
   return (
-    <div className="flex flex-col min-h-screen tracking-tightest font-sans">
+    <div className="flex flex-col min-h-screen font-sans text-white">
       <RecruiterNav />
 
       <main className="flex-grow flex items-center justify-center py-12 px-6 sm:px-8">
         <motion.div
-          className="max-w-2xl w-full bg-[#252731] rounded-2xl shadow-lg p-8 text-white"
+          className="glass-card max-w-2xl w-full rounded-3xl shadow-2xl p-8 text-white"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
@@ -132,7 +131,7 @@ const PostJob = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            Post a Job
+            Post a <span className="text-[#8b5cf6]">Job</span>
           </motion.h2>
 
           <motion.form
@@ -152,7 +151,7 @@ const PostJob = () => {
                   name="company_name"
                   value={formData.company_name}
                   onChange={handleChange}
-                  className={`${inputClass} bg-gray-700 cursor-not-allowed`}
+                  className={`${inputClass} opacity-50 cursor-not-allowed`}
                   disabled // ✅ Make it read-only
                 />
               </div>
@@ -256,10 +255,10 @@ const PostJob = () => {
                 value={formData.immediate_hiring}
                 onChange={handleChange}
                 required
-                className={`${inputClass} bg-[#252731] text-white`}
+                className={`${inputClass} bg-[#101014] text-white`}
               >
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
+                <option value="yes" className="bg-[#101014] text-white">Yes</option>
+                <option value="no" className="bg-[#101014] text-white">No</option>
               </select>
             </div>
 
@@ -270,14 +269,13 @@ const PostJob = () => {
             >
               <motion.button
                 type="submit"
-                className="bg-white text-black cursor-pointer rounded-full px-8 py-3 font-semibold hover:bg-gray-200 transition"
-                whileHover={{ backgroundColor: "#e5e5e5" }}
+                className="btn-recruiter cursor-pointer px-8 py-3 transition"
                 disabled={loading} // ✅ Disable button while loading
               >
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
                     <svg
-                      className="animate-spin h-5 w-5 text-black"
+                      className="animate-spin h-5 w-5 text-white"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"

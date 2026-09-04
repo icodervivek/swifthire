@@ -180,13 +180,13 @@ const UploadResume = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0b0b0b] text-white">
+    <div className="min-h-screen flex flex-col text-white">
       <Navbar />
       {/* ===== Upload Form Container ===== */}
       <div className="flex-grow flex flex-col items-center mt-12 justify-center px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-gray-900/80 border border-[#57c785] rounded-3xl shadow-xl p-10 sm:p-12 md:p-16 w-full max-w-lg text-center backdrop-blur-lg">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#57c785] mb-6">
-            Upload Your Resume
+        <div className="glass-card rounded-3xl shadow-2xl p-10 sm:p-12 md:p-16 w-full max-w-lg text-center">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-6">
+            Upload Your <span className="next-level-txt">Resume</span>
           </h2>
           <p className="text-gray-400 mb-8">
             Upload your resume and get instant job recommendations tailored to
@@ -199,7 +199,7 @@ const UploadResume = () => {
               onClick={handleClickUploadArea}
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
-              className="cursor-pointer border-2 border-dashed border-[#57c785] rounded-xl py-12 flex flex-col items-center justify-center transition-all hover:bg-[#57c785]/10"
+              className="cursor-pointer border-2 border-dashed border-[#57c785]/40 rounded-2xl py-12 flex flex-col items-center justify-center transition-all hover:bg-[#57c785]/10 hover:border-[#57c785]"
             >
               <Upload className="w-12 h-12 text-[#57c785] mb-3" />
               <p className="text-gray-300">Click to upload or drag & drop</p>
@@ -213,7 +213,7 @@ const UploadResume = () => {
               />
             </div>
           ) : (
-            <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 text-left relative">
+            <div className="bg-white/5 border border-white/10 p-6 rounded-2xl text-left relative">
               <div className="flex items-center gap-3">
                 <FileText className="text-[#57c785] w-6 h-6" />
                 <div>
@@ -231,10 +231,8 @@ const UploadResume = () => {
                     onClick={handleUpload}
                     disabled={uploading}
                     className={`${
-                      uploading
-                        ? "bg-gray-600"
-                        : "bg-[#57c785] hover:bg-[#4cb377]"
-                    } text-white px-6 py-2 rounded-full transition-transform duration-300 cursor-pointer`}
+                      uploading ? "bg-white/10 text-gray-400" : "btn-primary"
+                    } px-6 py-2 transition-transform duration-300 cursor-pointer`}
                   >
                     {uploading ? "Uploading..." : "Upload"}
                   </button>
@@ -266,7 +264,7 @@ const UploadResume = () => {
       {/* ===== Job Recommendations Section ===== */}
       {uploaded && (
         <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-5xl mx-auto">
-          <h3 className="text-2xl font-bold text-center text-[#57c785] mb-4">
+          <h3 className="text-2xl font-bold text-center text-white mb-4">
             {matchedJobs.length
               ? "Job Recommendations"
               : "No Matching Job Recommendations Found"}
@@ -281,7 +279,7 @@ const UploadResume = () => {
               {matchedJobs.map((job) => (
                 <div
                   key={job.job_id}
-                  className="p-6 border border-gray-700 rounded-lg hover:bg-gray-700 transition flex flex-col justify-between h-full"
+                  className="glass-card p-6 rounded-2xl hover:border-[#57c785]/30 transition flex flex-col justify-between h-full"
                 >
                   <div className="flex-1">
                     <p className="font-semibold text-lg">{job.company}</p>
@@ -293,7 +291,7 @@ const UploadResume = () => {
                     {appliedJobs.includes(Number(job.job_id)) ? (
                       <button
                         disabled
-                        className="px-6 py-2 w-full rounded-full text-sm font-semibold bg-gray-600 cursor-not-allowed"
+                        className="px-6 py-2 w-full rounded-full text-sm font-semibold bg-white/10 text-gray-400 cursor-not-allowed"
                       >
                         Applied
                       </button>
@@ -315,7 +313,7 @@ const UploadResume = () => {
                             setTimeout(() => navigate("/signin"), 2000);
                           }
                         }}
-                        className="px-6 py-2 w-full rounded-full text-sm font-semibold bg-green-600 hover:bg-green-700 text-white cursor-pointer"
+                        className="btn-primary px-6 py-2 w-full text-sm cursor-pointer"
                       >
                         Apply Now
                       </button>

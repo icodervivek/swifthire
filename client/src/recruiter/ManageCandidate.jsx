@@ -64,25 +64,25 @@ const ManageCandidate = () => {
             {jobs.map((job) => (
               <motion.div
                 key={job.job_id}
-                className="bg-[#111]/70 backdrop-blur-md rounded-2xl p-6 shadow-md"
+                className="glass-card rounded-2xl p-6 shadow-md hover:border-[#8b5cf6]/30 transition-colors"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ scale: 1.02 }}
               >
                 <h3 className="text-xl mb-2">
                   Role:{" "}
-                  <span className="font-bold text-[#57c785]">{job.hiring_for}</span>
+                  <span className="font-bold text-[#8b5cf6]">{job.hiring_for}</span>
                 </h3>
                 <p className="text-gray-300 mb-1">Company: {job.company_name}</p>
                 <p className="text-gray-300 mb-1">Open Positions: {job.open_positions}</p>
                 <p className="text-gray-300 mb-3">Applicants: {job.applicants_count}</p>
 
                 {job.applicants.length > 0 && (
-                  <div className="max-h-60 overflow-y-auto border-t border-gray-700 pt-2 mt-2 scrollbar-dark">
+                  <div className="max-h-60 overflow-y-auto border-t border-white/10 pt-2 mt-2 scrollbar-dark">
                     {job.applicants.map((user) => (
-                      <div key={user.id} className="mb-2 rounded-lg bg-gray-800">
+                      <div key={user.id} className="mb-2 rounded-lg bg-white/5">
                         <div
-                          className="flex justify-between p-2 cursor-pointer hover:bg-gray-700 transition"
+                          className="flex justify-between p-2 cursor-pointer hover:bg-white/10 transition rounded-lg"
                           onClick={() => toggleApplicant(job.job_id, user.id)}
                         >
                           <span>{user.name}</span>
@@ -90,7 +90,7 @@ const ManageCandidate = () => {
                         </div>
 
                         {expandedApplicants[job.job_id]?.[user.id] && (
-                          <div className="p-2 text-gray-300 bg-gray-900 border-t border-gray-700">
+                          <div className="p-2 text-gray-300 border-t border-white/10">
                             <p><strong>Experience:</strong> {user.experience ?? 0} months</p>
                             <p><strong>Previous Job Role:</strong> {user.previous_job_role || "N/A"}</p>
                             <p><strong>Contact Number:</strong> {user.contact_number || "N/A"}</p>

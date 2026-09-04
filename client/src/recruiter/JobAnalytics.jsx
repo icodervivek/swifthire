@@ -47,24 +47,24 @@ const JobAnalytics = () => {
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {/* Total Job Posts */}
             <motion.div
-              className="bg-[#111]/70 backdrop-blur-md rounded-2xl p-8 shadow-lg flex flex-col items-center justify-center"
+              className="glass-card rounded-2xl p-8 shadow-lg flex flex-col items-center justify-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               whileHover={{ scale: 1.03 }}
             >
               <h2 className="text-xl text-gray-400 mb-2">Total Job Posts</h2>
-              <p className="text-4xl font-bold text-[#57c785]">{jobCount}</p>
+              <p className="text-4xl font-bold text-[#8b5cf6]">{jobCount}</p>
             </motion.div>
 
             {/* Total Unique Applicants */}
             <motion.div
-              className="bg-[#111]/70 backdrop-blur-md rounded-2xl p-8 shadow-lg flex flex-col items-center justify-center"
+              className="glass-card rounded-2xl p-8 shadow-lg flex flex-col items-center justify-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               whileHover={{ scale: 1.03 }}
             >
               <h2 className="text-xl text-gray-400 mb-2">Total Applicants</h2>
-              <p className="text-4xl font-bold text-[#57c785]">{applicantCount}</p>
+              <p className="text-4xl font-bold text-[#8b5cf6]">{applicantCount}</p>
             </motion.div>
           </div>
         )}

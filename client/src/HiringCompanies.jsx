@@ -156,7 +156,7 @@ const HiringCompanies = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center bg-gray-800 p-12 rounded-xl shadow-lg mx-auto my-10"
+          className="glass-card text-center p-12 rounded-3xl shadow-xl mx-auto my-10"
         >
           <p className="text-3xl font-extrabold mb-6 text-white">
             Discover Your Perfect Job with AI
@@ -165,7 +165,7 @@ const HiringCompanies = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-gradient-to-r from-[#2a7b9b] to-[#57c785] text-white font-semibold px-8 py-3 rounded-full shadow-lg transition-transform cursor-pointer"
+              className="btn-primary px-8 py-3 cursor-pointer"
             >
               Check Now
             </motion.button>
@@ -180,7 +180,7 @@ const HiringCompanies = () => {
         />
 
         <motion.h2
-          className="text-4xl font-extrabold text-center mt-10 mb-10"
+          className="text-4xl font-extrabold text-center mt-10 mb-10 text-white"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
@@ -200,7 +200,7 @@ const HiringCompanies = () => {
               {companies.map((company, index) => (
                 <motion.div
                   key={company.job_id}
-                  className="bg-gray-900 text-white rounded-3xl shadow-lg p-8 flex flex-col justify-between hover:scale-105 transition-transform duration-300"
+                  className="glass-card text-white rounded-3xl shadow-lg p-8 flex flex-col justify-between hover:border-[#57c785]/30 hover:scale-[1.02] transition-all duration-300"
                   custom={index}
                   initial="hidden"
                   animate="visible"
@@ -270,8 +270,8 @@ const HiringCompanies = () => {
                       disabled={appliedJobs.includes(company.job_id)}
                       className={`font-semibold px-5 py-3 rounded-full text-sm shadow-md text-center flex-shrink-0 ${
                         appliedJobs.includes(company.job_id)
-                          ? "bg-gray-600 text-white cursor-not-allowed"
-                          : "bg-green-600 text-white cursor-pointer hover:opacity-90"
+                          ? "bg-white/10 text-gray-400 cursor-not-allowed"
+                          : "btn-primary cursor-pointer"
                       }`}
                     >
                       {appliedJobs.includes(company.job_id)
