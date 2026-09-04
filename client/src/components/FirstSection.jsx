@@ -11,12 +11,12 @@ const FirstSection = () => {
     <div className="relative w-full min-h-screen flex flex-col items-center justify-center text-center overflow-hidden px-4 sm:px-6 py-12 md:py-20">
       {/* Blurred background */}
       <div
-        className="absolute inset-0 bg-cover bg-center filter blur-2xl scale-110"
+        className="absolute inset-0 bg-cover bg-center filter blur-2xl scale-110 opacity-60"
         style={{ backgroundImage: `url(${CoverImg})` }}
       ></div>
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/20"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-[#08090a]"></div>
 
       {/* Content */}
       <motion.div
@@ -27,19 +27,19 @@ const FirstSection = () => {
       >
         {/* Heading */}
         <motion.h1
-          className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-snug md:leading-tight masked-text break-words mt-16 md:mt-20"
+          className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-snug md:leading-tight text-white break-words mt-16 md:mt-20"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2 }}
         >
           SwiftHire Makes
           <br />
-          <span className="next-level-txt text-[#57c785]">Hiring Easy</span>
+          <span className="next-level-txt">Hiring Easy</span>
         </motion.h1>
 
         {/* Subheading */}
         <motion.p
-          className="mt-6 md:mt-8 text-sm sm:text-base md:text-lg lg:text-xl text-[#a39999] break-words max-w-2xl"
+          className="mt-6 md:mt-8 text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 break-words max-w-2xl"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.4 }}
@@ -65,7 +65,7 @@ const FirstSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center bg-gray-800 py-16 md:py-8 px-12 rounded-2xl shadow-xl mt-10 mx-auto "
+          className="glass-card text-center py-16 md:py-8 px-12 rounded-3xl shadow-xl mt-10 mx-auto"
         >
           <p className="text-3xl md:text-3xl font-extrabold mb-6 text-white">
             Discover Your Perfect Job with AI
@@ -74,7 +74,7 @@ const FirstSection = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-[#0a803b] text-white font-semibold px-8 md:px-10 py-3 md:py-4 rounded-full shadow-lg transition-transform cursor-pointer"
+              className="btn-primary px-8 md:px-10 py-3 md:py-4 cursor-pointer"
             >
               Check Now
             </motion.button>

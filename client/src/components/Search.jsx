@@ -30,26 +30,14 @@ const Search = ({ initialQuery = "", onSearch }) => {
         onChange={(e) => setQuery(e.target.value)}
         onKeyDown={handleEnter}
         className="
+          field
           flex-1
-          px-4 sm:px-5 md:px-6 
-          py-3 
-          rounded-t-xl sm:rounded-l-xl sm:rounded-tr-none 
-          border border-gray-300 
-          focus:outline-none focus:ring-2 focus:ring-[#57c785] 
-          bg-gray-800 text-white placeholder-gray-400
+          rounded-t-xl sm:rounded-l-xl sm:rounded-tr-none
         "
       />
       <button
         onClick={handleSearch}
-        className="
-          px-6 sm:px-6 md:px-8 
-          py-3 
-          bg-[#0a803b] hover:bg-[#4cb377] 
-          text-white font-semibold 
-          rounded-b-xl sm:rounded-r-xl sm:rounded-bl-none 
-          transition-colors cursor-pointer
-          flex-shrink-0
-        "
+        className="btn-primary px-6 sm:px-6 md:px-8 py-3 rounded-b-xl sm:rounded-r-xl sm:rounded-bl-none cursor-pointer flex-shrink-0"
       >
         Find Jobs
       </button>

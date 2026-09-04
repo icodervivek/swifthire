@@ -22,7 +22,7 @@ const HeroSection = () => {
     <section className="py-16 px-6 sm:px-10 lg:px-20 bg-gradient-to-b from-[#0a0a0a] to-[#111111]">
       <div className="text-center max-w-5xl mx-auto mb-14">
         <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4">
-          What would you like to <span className="text-[#57c785]">do?</span>
+          What would you like to <span className="next-level-txt">do?</span>
         </h2>
         <p className="text-gray-400 text-lg sm:text-xl">
           Choose an option below to find your path. Whether you want to find a job, hire a candidate, or explore AI-based recommendations, we’ve got you covered.

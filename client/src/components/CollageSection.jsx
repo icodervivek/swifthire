@@ -27,7 +27,7 @@ const CollageSection = () => {
           variants={textVariants}
         >
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
-            Skills Over <span className="text-[#57c785]">Resumes</span>, Talent Over <span className="text-[#d11c0f]">Titles</span>
+            Skills Over <span className="text-[#57c785]">Resumes</span>, Talent Over <span className="text-amber-400">Titles</span>
           </h1>
           <p className="text-gray-300 text-base sm:text-lg mb-6">
             Your abilities define your future, not just your degree. SwiftHire connects real talent to real opportunities with skill-first assessments and data-driven matching.
