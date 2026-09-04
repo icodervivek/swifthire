@@ -38,15 +38,15 @@ const About = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-6 masked-text leading-tight">
-              About SwiftHire
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
+              About <span className="next-level-txt">SwiftHire</span>
             </h2>
-            <p className="text-[#a39999] text-base sm:text-lg mb-4">
+            <p className="text-gray-400 text-base sm:text-lg mb-4">
               SwiftHire is a platform dedicated to connecting talented
               individuals with meaningful opportunities. Our mission is to make
               hiring easy and efficient for both employers and job seekers.
             </p>
-            <p className="text-[#a39999] text-base sm:text-lg mb-6">
+            <p className="text-gray-400 text-base sm:text-lg mb-6">
               Whether you’re looking for a full-time role, part-time job, or
               freelance project, SwiftHire prioritizes skill and talent over
               resumes. We leverage data-driven matching and skill-first

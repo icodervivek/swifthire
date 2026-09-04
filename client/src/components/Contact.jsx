@@ -54,7 +54,7 @@ const Contact = () => {
         <div className="max-w-7xl w-full flex flex-col md:flex-row items-center justify-center gap-12">
           {/* Left: Form */}
           <motion.div
-            className="contact-form w-full md:w-1/2 max-w-md bg-[#4639728f] p-8 rounded-lg shadow-md"
+            className="glass-card contact-form w-full md:w-1/2 max-w-md p-8 rounded-3xl shadow-xl"
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -68,7 +68,7 @@ const Contact = () => {
                 type="text"
                 name="name"
                 placeholder="Full Name"
-                className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="field rounded-xl"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -77,7 +77,7 @@ const Contact = () => {
                 type="email"
                 name="email"
                 placeholder="Email"
-                className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="field rounded-xl"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -85,20 +85,20 @@ const Contact = () => {
               <textarea
                 name="message"
                 placeholder="Your Message"
-                className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400 h-32 resize-none"
+                className="field rounded-xl h-32 resize-none"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 required
               />
               <button
                 type="submit"
-                className="bg-gradient-to-r from-[#2a7b9b] to-[#4e9ccf] text-white px-6 py-3 rounded-full font-semibold hover:scale-105 transition-transform cursor-pointer flex justify-center items-center gap-2"
+                className="btn-primary px-6 py-3 hover:scale-[1.02] transition-transform cursor-pointer flex justify-center items-center gap-2"
                 disabled={loading} // ✅ Disable button while sending
               >
                 {loading ? (
                   <>
                     <svg
-                      className="animate-spin h-5 w-5 text-white"
+                      className="animate-spin h-5 w-5 text-[#06110a]"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
