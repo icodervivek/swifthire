@@ -12,6 +12,24 @@ import recruiterRouter from "./routes/recruiterRouter.js";
 dotenv.config();
 const app = express();
 
+// -----------------------
+// Crash diagnostics
+// -----------------------
+// Without these, an unhandled promise rejection anywhere in the app (a bad
+// await, a fire-and-forget async call, a third-party library's internal
+// promise) silently kills the whole Node process with no log output —
+// the server just "stops" for no visible reason. Log it instead so the
+// real cause shows up here, and only exit for uncaughtException since the
+// process may be in a genuinely broken state after one of those.
+process.on("unhandledRejection", (reason) => {
+  console.error("🔥 Unhandled Rejection:", reason);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("🔥 Uncaught Exception:", err);
+  process.exit(1);
+});
+
 app.use(express.json());
 app.use(
   cors({
