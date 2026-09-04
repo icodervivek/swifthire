@@ -4,11 +4,13 @@ import Footer from "../Footer";
 import axios from "axios";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 const Signin = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false); // ✅ Loading state
 
   const handleSignin = async (e) => {
@@ -53,34 +55,43 @@ const Signin = () => {
       <div className="signup-section flex flex-col md:flex-row items-center mt-10 justify-center px-4 sm:px-6 lg:px-12 py-12 min-h-screen">
         <div className="w-full max-w-7xl flex flex-col md:flex-row items-center justify-center gap-10">
           {/* Left Section: Form */}
-          <div className="form-section w-full md:w-1/2 max-w-md p-8 rounded-lg shadow-md">
-            <h2 className="text-3xl font-bold mb-6 text-center text-[#fff]">
+          <div className="glass-card form-section w-full md:w-1/2 max-w-md p-8 rounded-3xl shadow-xl">
+            <h2 className="text-3xl font-bold mb-6 text-center text-white">
               Sign In
             </h2>
             <form className="flex flex-col gap-4" onSubmit={handleSignin}>
               <input
                 type="email"
                 placeholder="Email"
-                className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="field rounded-xl"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <input
-                type="password"
-                placeholder="Password"
-                className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  className="field rounded-xl pr-10"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition cursor-pointer"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
               <button
                 type="submit"
-                className="bg-purple-500 hover:bg-purple-600 cursor-pointer transition tracking-widest text-white py-3 rounded text-lg mt-2 w-full flex justify-center items-center gap-2"
+                className="btn-primary py-3 text-lg mt-2 w-full flex justify-center items-center gap-2 cursor-pointer"
                 disabled={loading} // ✅ Disable button while loading
               >
                 {loading ? (
                   <>
                     <svg
-                      className="animate-spin h-5 w-5 text-white"
+                      className="animate-spin h-5 w-5 text-[#06110a]"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -110,7 +121,7 @@ const Signin = () => {
               Don't have an account?{" "}
               <span
                 onClick={() => navigate("/signup")}
-                className="text-purple-500 font-semibold cursor-pointer hover:underline transition-colors"
+                className="text-[#57c785] font-semibold cursor-pointer hover:underline transition-colors"
               >
                 Sign Up Now
               </span>

@@ -68,8 +68,7 @@ const RecruiterSignup = () => {
   }
 };
 
-  const inputClass =
-    "w-full h-11 text-base border border-gray-300 rounded-lg px-4 focus:ring-2 focus:ring-[#1E4633] outline-none";
+  const inputClass = "field field-recruiter w-full h-11 text-base rounded-lg px-4";
 
 
     useEffect(() => {
@@ -77,7 +76,7 @@ const RecruiterSignup = () => {
       }, []);
 
   return (
-    <div className="flex flex-col min-h-screen tracking-tightest font-sans">
+    <div className="flex flex-col min-h-screen font-sans text-white">
       <RecruiterNav />
 
       <main className="flex-grow flex items-center justify-center py-12 px-6 sm:px-8">
@@ -85,7 +84,7 @@ const RecruiterSignup = () => {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="max-w-2xl w-full bg-[#252731] rounded-2xl shadow-lg p-8 text-white"
+          className="glass-card max-w-2xl w-full rounded-3xl shadow-2xl p-8 text-white"
         >
           <motion.h2
             className="text-3xl font-bold text-center mb-2"
@@ -93,11 +92,11 @@ const RecruiterSignup = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            Recruiter Registration
+            Recruiter <span className="text-[#8b5cf6]">Registration</span>
           </motion.h2>
 
           <motion.p
-            className="text-center mb-8 text-gray-200"
+            className="text-center mb-8 text-gray-400"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
@@ -241,23 +240,23 @@ const RecruiterSignup = () => {
                   value={formData.organisation_type}
                   onChange={handleChange}
                   required
-                  className={`${inputClass} bg-[#252731] text-white`}
+                  className={`${inputClass} bg-[#101014] text-white`}
                 >
-                  <option value="">Select Type</option>
-                  <option value="Software Development">
+                  <option value="" className="bg-[#101014] text-white">Select Type</option>
+                  <option value="Software Development" className="bg-[#101014] text-white">
                     Software Development
                   </option>
-                  <option value="Finance & Banking">Finance & Banking</option>
-                  <option value="Education & Training">
+                  <option value="Finance & Banking" className="bg-[#101014] text-white">Finance & Banking</option>
+                  <option value="Education & Training" className="bg-[#101014] text-white">
                     Education & Training
                   </option>
-                  <option value="Healthcare">Healthcare</option>
-                  <option value="Construction">Construction</option>
-                  <option value="Manufacturing">Manufacturing</option>
-                  <option value="Marketing & Advertising">
+                  <option value="Healthcare" className="bg-[#101014] text-white">Healthcare</option>
+                  <option value="Construction" className="bg-[#101014] text-white">Construction</option>
+                  <option value="Manufacturing" className="bg-[#101014] text-white">Manufacturing</option>
+                  <option value="Marketing & Advertising" className="bg-[#101014] text-white">
                     Marketing & Advertising
                   </option>
-                  <option value="Other">Other</option>
+                  <option value="Other" className="bg-[#101014] text-white">Other</option>
                 </select>
               </div>
             </div>
@@ -271,14 +270,13 @@ const RecruiterSignup = () => {
             >
              <motion.button
   type="submit"
-  className="bg-white text-black cursor-pointer rounded-full px-8 py-3 font-semibold hover:bg-gray-200 transition"
-  whileHover={{ backgroundColor: "#e5e5e5" }}
+  className="btn-recruiter cursor-pointer px-8 py-3 transition"
   disabled={loading} // ✅ Disable while loading
 >
   {loading ? (
     <div className="flex items-center justify-center gap-2">
       <svg
-        className="animate-spin h-5 w-5 text-black"
+        className="animate-spin h-5 w-5 text-white"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"

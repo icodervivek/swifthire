@@ -47,9 +47,9 @@ const UpdateProfileModal = ({ isOpen, onClose, onSuccess }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
       <motion.div
-        className="bg-gray-900 p-8 rounded-2xl w-full max-w-md text-white"
+        className="glass-card p-8 rounded-3xl w-full max-w-md text-white shadow-2xl"
         initial={{ scale: 0.8 }}
         animate={{ scale: 1 }}
       >
@@ -58,30 +58,30 @@ const UpdateProfileModal = ({ isOpen, onClose, onSuccess }) => {
           placeholder="Experience"
           value={experience}
           onChange={(e) => setExperience(e.target.value)}
-          className="w-full p-3 rounded mb-3 text-black"
+          className="field rounded-xl mb-3"
         />
         <input
           placeholder="Previous Job Role"
           value={previousJobRole}
           onChange={(e) => setPreviousJobRole(e.target.value)}
-          className="w-full p-3 rounded mb-3 text-black"
+          className="field rounded-xl mb-3"
         />
         <input
           placeholder="Contact Number"
           value={contactNumber}
           onChange={(e) => setContactNumber(e.target.value)}
-          className="w-full p-3 rounded mb-3 text-black"
+          className="field rounded-xl mb-3"
         />
         <div className="flex justify-end gap-4 mt-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded bg-gray-700 hover:bg-gray-600"
+            className="btn-ghost px-4 py-2 cursor-pointer"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-2 rounded bg-green-600 hover:bg-green-500"
+            className="btn-primary px-4 py-2 cursor-pointer"
           >
             Save
           </button>

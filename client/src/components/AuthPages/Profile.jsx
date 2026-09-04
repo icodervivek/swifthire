@@ -118,7 +118,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900 text-white">
+    <div className="min-h-screen flex flex-col text-white">
       <Navbar />
       <ToastContainer />
 
@@ -141,7 +141,7 @@ const Profile = () => {
           <>
             {/* ===== User Info Card ===== */}
             <motion.div
-              className="w-full max-w-md bg-[#0b0b0b]/60 backdrop-blur-md shadow-lg rounded-3xl p-10 text-center mb-8"
+              className="glass-card w-full max-w-md shadow-xl rounded-3xl p-10 text-center mb-8"
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8 }}
@@ -165,7 +165,7 @@ const Profile = () => {
                     placeholder="Experience (in months)"
                     value={formData.experience}
                     onChange={handleChange}
-                    className="w-full mb-3 px-4 py-2 rounded-lg border-1"
+                    className="field rounded-xl mb-3"
                   />
                   <input
                     type="text"
@@ -173,7 +173,7 @@ const Profile = () => {
                     placeholder="Previous Job Role"
                     value={formData.previous_job_role}
                     onChange={handleChange}
-                    className="w-full mb-3 px-4 py-2 rounded-lg border-1"
+                    className="field rounded-xl mb-3"
                   />
                   <input
                     type="text"
@@ -181,13 +181,13 @@ const Profile = () => {
                     placeholder="Contact Number"
                     value={formData.contact_number}
                     onChange={handleChange}
-                    className="w-full mb-3 px-4 py-2 rounded-lg border-1"
+                    className="field rounded-xl mb-3"
                   />
 
                   <div className="flex justify-center gap-4 mt-2">
                     <motion.button
                       onClick={handleSave}
-                      className="bg-green-500 cursor-pointer hover:bg-green-600 py-2 px-6 rounded-full font-semibold shadow-lg"
+                      className="btn-primary cursor-pointer py-2 px-6"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -195,7 +195,7 @@ const Profile = () => {
                     </motion.button>
                     <motion.button
                       onClick={() => setIsEditing(false)}
-                      className="bg-gray-500 cursor-pointer hover:bg-gray-600 py-2 px-6 rounded-full font-semibold shadow-lg"
+                      className="btn-ghost cursor-pointer py-2 px-6"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -219,7 +219,7 @@ const Profile = () => {
 
                   <motion.button
                     onClick={handleEditClick}
-                    className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white py-2 px-6 rounded-full font-semibold shadow-lg mt-4"
+                    className="btn-primary cursor-pointer py-2 px-6 mt-4"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -230,7 +230,7 @@ const Profile = () => {
 
               <motion.button
                 onClick={handleLogout}
-                className="bg-red-500 hover:bg-red-600 cursor-pointer text-white mx-2 py-2 px-6 rounded-full font-semibold shadow-lg mt-4"
+                className="bg-red-500/90 hover:bg-red-500 cursor-pointer text-white mx-2 py-2 px-6 rounded-full font-semibold shadow-lg mt-4"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -240,7 +240,7 @@ const Profile = () => {
 
             {/* ===== Jobs Applied Section ===== */}
             <motion.div
-              className="w-full max-w-4xl bg-[#111111]/70 backdrop-blur-md shadow-lg rounded-3xl p-8"
+              className="glass-card w-full max-w-4xl shadow-lg rounded-3xl p-8"
               initial={{ y: 30, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8 }}
@@ -258,7 +258,7 @@ const Profile = () => {
                   {appliedJobs.map((job) => (
                     <div
                       key={job.job_id}
-                      className="bg-gray-800 p-4 rounded-2xl shadow-md hover:scale-105 transition-transform duration-200"
+                      className="bg-white/5 border border-white/10 p-4 rounded-2xl shadow-md hover:bg-white/[0.07] transition-colors duration-200"
                     >
                       <h4 className="text-lg text-white mb-1">
                         Job Role: &nbsp;

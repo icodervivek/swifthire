@@ -31,8 +31,8 @@ const ProfileModal = ({ isOpen, onClose, user, onProfileUpdated }) => {
     <Modal
       isOpen={isOpen}
       onRequestClose={onClose}
-      className="bg-gray-900 text-white rounded-xl p-8 max-w-md mx-auto mt-20"
-      overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+      className="glass-card text-white rounded-3xl p-8 max-w-md mx-auto mt-20 shadow-2xl"
+      overlayClassName="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center"
     >
       <h2 className="text-2xl font-bold mb-4">Complete Your Profile</h2>
       <input
@@ -40,25 +40,25 @@ const ProfileModal = ({ isOpen, onClose, user, onProfileUpdated }) => {
         placeholder="Experience (in months)"
         value={experience}
         onChange={(e) => setExperience(e.target.value)}
-        className="w-full mb-3 p-2 rounded bg-gray-800 border border-gray-600"
+        className="field rounded-xl mb-3"
       />
       <input
         type="text"
         placeholder="Previous Job Role"
         value={previousJobRole}
         onChange={(e) => setPreviousJobRole(e.target.value)}
-        className="w-full mb-3 p-2 rounded bg-gray-800 border border-gray-600"
+        className="field rounded-xl mb-3"
       />
       <input
         type="text"
         placeholder="Contact Number"
         value={contactNumber}
         onChange={(e) => setContactNumber(e.target.value)}
-        className="w-full mb-5 p-2 rounded bg-gray-800 border border-gray-600"
+        className="field rounded-xl mb-5"
       />
       <button
         onClick={handleSubmit}
-        className="bg-green-600 px-5 py-2 rounded hover:bg-green-500"
+        className="btn-primary px-5 py-2 cursor-pointer"
       >
         Save & Apply
       </button>

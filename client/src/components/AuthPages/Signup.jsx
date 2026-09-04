@@ -4,12 +4,14 @@ import Footer from "../Footer";
 import axios from "axios";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 const Signup = () => {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false); // ✅ Loading state
 
   useEffect(() => {
@@ -53,14 +55,14 @@ const Signup = () => {
       <div className="signup-section flex flex-col md:flex-row items-center justify-center px-4 sm:px-6 lg:px-12 py-12 min-h-screen mt-10">
         <div className="w-full max-w-7xl flex flex-col md:flex-row items-center justify-center gap-10">
           {/* Left Section: Form */}
-          <div className="form-section w-full md:w-1/2 max-w-md p-8 rounded-lg shadow-md">
-            <h2 className="text-3xl font-bold mb-6 text-center">Sign Up</h2>
+          <div className="glass-card form-section w-full md:w-1/2 max-w-md p-8 rounded-3xl shadow-xl">
+            <h2 className="text-3xl font-bold mb-6 text-center text-white">Sign Up</h2>
             <form className="flex flex-col gap-4" onSubmit={handleSignup}>
               <input
                 type="text"
                 name="name"
                 placeholder="Full Name"
-                className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="field rounded-xl"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -69,31 +71,40 @@ const Signup = () => {
                 type="email"
                 name="email"
                 placeholder="Email"
-                className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="field rounded-xl"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                className="p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  className="field rounded-xl pr-10"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition cursor-pointer"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
 
               {/* Submit Button */}
               <button
                 type="submit"
-                className="bg-green-500 hover:bg-green-600 cursor-pointer transition tracking-widest text-white py-3 rounded text-lg flex justify-center items-center gap-2"
+                className="btn-primary py-3 text-lg flex justify-center items-center gap-2 cursor-pointer"
                 disabled={loading} // ✅ Disable button while loading
               >
                 {loading ? (
                   <>
                     <svg
-                      className="animate-spin h-5 w-5 text-white"
+                      className="animate-spin h-5 w-5 text-[#06110a]"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"

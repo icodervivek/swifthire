@@ -68,20 +68,19 @@ const RecruiterSignin = () => {
   };
 
   // Common input style
-  const inputClass =
-    "w-full h-11 text-base border border-gray-300 rounded-lg px-4 focus:ring-2 focus:ring-[#1E4633] outline-none";
+  const inputClass = "field field-recruiter w-full h-11 text-base rounded-lg px-4";
 
   useEffect(() => {
     document.title = "Recruiter Sign In - SwiftHire";
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen tracking-tightest font-sans">
+    <div className="flex flex-col min-h-screen font-sans text-white">
       <RecruiterNav />
 
       <main className="flex-grow flex items-center justify-center py-12 px-6 sm:px-8">
         <motion.div
-          className="max-w-md w-full bg-[#252731] rounded-2xl shadow-lg p-8 text-white"
+          className="glass-card max-w-md w-full rounded-3xl shadow-2xl p-8 text-white"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
@@ -92,11 +91,11 @@ const RecruiterSignin = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            Recruiter Login
+            Recruiter <span className="text-[#8b5cf6]">Login</span>
           </motion.h2>
 
           <motion.p
-            className="text-center mb-8 text-gray-200"
+            className="text-center mb-8 text-gray-400"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
@@ -160,14 +159,13 @@ const RecruiterSignin = () => {
             >
               <motion.button
                 type="submit"
-                className="bg-white text-black cursor-pointer rounded-full px-8 py-3 font-semibold hover:bg-gray-200 transition focus:outline-none focus:ring-0"
-                whileHover={{ backgroundColor: "#e5e5e5" }}
+                className="btn-recruiter cursor-pointer px-8 py-3 transition focus:outline-none focus:ring-0"
                 disabled={loading} // prevent multiple clicks
               >
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
                     <svg
-                      className="animate-spin h-5 w-5 text-black"
+                      className="animate-spin h-5 w-5 text-white"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -197,7 +195,7 @@ const RecruiterSignin = () => {
               Don't have an account?{" "}
               <span
                 onClick={() => navigate("/recruiter/signup")}
-                className="text-white font-semibold cursor-pointer hover:underline"
+                className="text-[#8b5cf6] font-semibold cursor-pointer hover:underline"
               >
                 Sign Up Now
               </span>
