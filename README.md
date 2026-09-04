@@ -59,14 +59,22 @@ cd client
 npm install
 ```
 
-### 3. Set up environment variables
+### 3. Set up the database
+
+Create a project at [supabase.com](https://supabase.com), then open its **SQL Editor** and run [`server/schema.sql`](server/schema.sql) to create the `users`, `recruiters`, `jobs`, `job_applications`, `contacts`, `companies`, and `job_seekers` tables (with Row Level Security enabled — the backend's service-role key bypasses it, so no policies are needed).
+
+You'll need two keys from **Project Settings → API Keys** for the next step:
+* the **Project URL**
+* the **secret** key (starts with `sb_secret_...` — not the `publishable` key; the backend needs privileged access to bypass RLS)
+
+### 4. Set up environment variables
 
 Create a `.env` file in the backend:
 
 ```env
 PORT=3000                      # The port your backend server will run on (e.g., 3000)
 SUPABASE_URL=https://xyz.supabase.co  # Your Supabase project URL (found in your Supabase dashboard)
-SUPABASE_SERVICE_KEY=your_service_role_key  # Supabase API key with service role or anon key for server-side access
+SUPABASE_SERVICE_KEY=your_service_role_key  # Supabase secret key (sb_secret_...) — NOT the publishable/anon key
 JWT_SECRET=your_secret_key      # Secret key used to sign JWT tokens for authentication
 GROQ_API_KEY=your_groq_api_key      # API key for Groq (used for AI-based job recommendations)
 FRONTEND_ORIGIN=http://localhost:5173  # URL of your frontend (used for CORS)
@@ -78,7 +86,7 @@ Create a `.env` file in the client:
 VITE_API_URL=http://localhost:3000  # URL where your backend is running (used for API calls from frontend)
 ```
 
-### 4. Run the application
+### 5. Run the application
 
 #### Backend
 
@@ -86,6 +94,8 @@ VITE_API_URL=http://localhost:3000  # URL where your backend is running (used fo
 cd server
 npm run dev
 ```
+
+`npm run dev` uses `nodemon`, so it auto-restarts on file changes and on crashes.
 
 #### Frontend
 
@@ -95,6 +105,8 @@ npm run dev
 ```
 
 Open your browser at **[http://localhost:5173](http://localhost:5173)** to see the app.
+
+> **Windows users:** run `npm run dev` from **PowerShell**, not Git Bash/MINGW64. Git Bash's job control doesn't keep long-running Node processes properly attached, so the dev server can silently die shortly after starting — PowerShell doesn't have this problem.
 
 ---
 
@@ -108,9 +120,9 @@ git clone https://github.com/icodervivek/swifthire.git
 cd swifthire
 ```
 
-### 2️⃣ Create environment files
+### 2️⃣ Set up the database and create environment files
 
-You must create `.env` files **inside both** `server/` and `client/` folders before building.
+Create your Supabase project and run [`server/schema.sql`](server/schema.sql) in its SQL Editor (see [Set up the database](#3-set-up-the-database) above), then create `.env` files **inside both** `server/` and `client/` folders before building.
 
 #### `server/.env`
 ```env
@@ -161,6 +173,7 @@ swifthire/
 │
 ├─ client/           # React frontend
 ├─ server/           # Node.js + Express backend
+│  └─ schema.sql     # Supabase table definitions
 ├─ docker-compose.yml
 ├─ README.md
 ```
