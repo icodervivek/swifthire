@@ -13,7 +13,7 @@ Whether you're a recruiter looking to fill positions quickly or a job seeker sea
 
 ## 🛠 Features
 
-* ⚡ **AI-Based Job Recommendations:** Intelligent suggestions for job seekers based on skills, experience, and preferences using Google Gemini 2.0 Flash API with **LangChain** integration.
+* ⚡ **AI-Based Job Recommendations:** Intelligent suggestions for job seekers based on skills, experience, and preferences using Groq (GPT-OSS 120B) with **LangChain** integration.
 * 💼 **Recruiter Management:** Recruiters can post job requirements, manage listings, and track applications for their organization.
 * 🏢 **Company Hiring Dashboard:** View recent job postings, open positions, and applicants in a single dashboard.
 * 📱 **Responsive UI:** Clean, modern design for seamless experience on all devices.
@@ -29,7 +29,7 @@ Whether you're a recruiter looking to fill positions quickly or a job seeker sea
 | Frontend | React, Tailwind CSS                                |
 | Backend  | Node.js, Express.js                                |
 | Database | Supabase (PostgreSQL)                              |
-| AI       | Job Recommendation Engine using Google Gemini 2.0 Flash API + LangChain |
+| AI       | Job Recommendation Engine using Groq (GPT-OSS 120B) API + LangChain |
 | API      | RESTful APIs with JWT authentication               |
 
 ---
@@ -68,7 +68,7 @@ PORT=3000                      # The port your backend server will run on (e.g.,
 SUPABASE_URL=https://xyz.supabase.co  # Your Supabase project URL (found in your Supabase dashboard)
 SUPABASE_SERVICE_KEY=your_service_role_key  # Supabase API key with service role or anon key for server-side access
 JWT_SECRET=your_secret_key      # Secret key used to sign JWT tokens for authentication
-GOOGLE_API_KEY=your_gemini_api_key  # API key for Google Gemini (used for AI-based job recommendations)
+GROQ_API_KEY=your_groq_api_key      # API key for Groq (used for AI-based job recommendations)
 FRONTEND_ORIGIN=http://localhost:5173  # URL of your frontend (used for CORS)
 ```
 
@@ -118,7 +118,7 @@ PORT=3000
 SUPABASE_URL=https://xyz.supabase.co
 SUPABASE_SERVICE_KEY=your_service_role_key
 JWT_SECRET=your_secret_key
-GOOGLE_API_KEY=your_gemini_api_key
+GROQ_API_KEY=your_groq_api_key
 FRONTEND_ORIGIN=http://localhost:5173
 ```
 
@@ -170,7 +170,7 @@ swifthire/
 ## ⚡ Usage
 
 * 🔑 **Sign Up / Sign In**: Create an account or login to access profile and hire workers.
-* 🧑‍💼 **Job Seekers**: View available jobs, get AI-based recommendations tailored to skills and experience using Google Gemini 2.0 Flash API + LangChain.
+* 🧑‍💼 **Job Seekers**: View available jobs, get AI-based recommendations tailored to skills and experience using Groq (GPT-OSS 120B) + LangChain.
 * 🏢 **Hiring Companies / Recruiters**: Post job requirements, manage listings, track applications, and maintain organization-specific job data.
 * 📩 **Contact Form**: Submit queries or feedback directly from the app.
 * 👤 **Profile Page**: View and manage your account details securely.
@@ -184,4 +184,4 @@ Feel free to check the [issues page](https://github.com/icodervivek/swifthire/is
 
 ---
 
-**SwiftHire** – Making hiring simple, fast, and reliable with AI-powered job recommendations and recruiter management using Google Gemini 2.0 Flash API + LangChain. 💼✨
+**SwiftHire** – Making hiring simple, fast, and reliable with AI-powered job recommendations and recruiter management using Groq (GPT-OSS 120B) + LangChain. 💼✨

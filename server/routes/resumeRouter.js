@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
 import pdf from "pdf-parse-new";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { ChatGroq } from "@langchain/groq";
 import { LLMChain } from "langchain/chains";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { supabase } from "../supabaseClient.js";
@@ -9,11 +9,11 @@ import { supabase } from "../supabaseClient.js";
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Gemini model setup
-const model = new ChatGoogleGenerativeAI({
-  model: "gemini-2.0-flash",
+// Groq model setup
+const model = new ChatGroq({
+  model: "openai/gpt-oss-120b",
   temperature: 0.3,
-  apiKey: process.env.GOOGLE_API_KEY,
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 // Step 1: Extract skills prompt
@@ -126,7 +126,7 @@ router.post("/upload", upload.single("pdf"), async (req, res) => {
       contact_email: job.contact_email,
     }));
 
-    // Step 3: Use Gemini to find best job matches
+    // Step 3: Use Groq to find best job matches
     const matchResponse = await jobMatchChain.call({
       skills: JSON.stringify(skillsJson),
       jobs: JSON.stringify(jobsData),
